@@ -1,8 +1,9 @@
 import React, { useState, useLayoutEffect, useRef, useReducer } from 'react';
 
+// performance가 존재하지 않으면 Date로 대체
 const timeObject = typeof performance === 'object' ? performance : Date;
-
-const getNow = () => Math.floor(timeObject.now() / 1000);
+const getNow = () => timeObject.now();
+const MiliSecondsToSeconds = (miliseconds) => Math.floor(miliseconds / 1000);
 
 // getHours, getMinutes, getSeconds는 초로 표현된 시간값과
 // 여기서 구해진 시, 분을을 입력값으로 받아
@@ -115,22 +116,22 @@ export default function (props) {
       let rAF;
 
       // 시작 버튼이 클릭된 시간에서 타이머가 실행된 시간을 뺌
-      // 처음 클릭 시에는 컴포넌트가 마운트된 시간을 뺌
-      let now = getNow();
-      let runningTime = runningTimeRef.current;
-      let elapsed = now - runningTime;
-
+      // 처음 클릭 시에는 컴포넌트가 마운트된 시간이 빠짐 왜냐하면 실행시간의 초기값이 마운트시간이기 때문
+      let buttonClickedTime = getNow();
+      let prevRunningTime = runningTimeRef.current;
+      let elapsed = buttonClickedTime - prevRunningTime;
+      let now;
       // 컴포넌트가 화면에 painting 될 때마다 실행될 함수
       function timer() {
         // timer 함수가 실행될 때마다
         // 현재시간에서 elapsed를 빼줌으로써
         // 타이머가 실행된 시간만 계산하게 됨
         now = getNow() - elapsed;
-
+        let nowAsSec = MiliSecondsToSeconds(now);
         // 초로 표현된 시간값을 시, 분, 초값으로 변환
-        const hours = getHours(now);
-        const minutes = getMinutes(now, hours);
-        const seconds = getSeconds(now, hours, minutes);
+        const hours = getHours(nowAsSec);
+        const minutes = getMinutes(nowAsSec, hours);
+        const seconds = getSeconds(nowAsSec, hours, minutes);
 
         setHours(hours);
         setMinutes(minutes);
@@ -150,101 +151,108 @@ export default function (props) {
   }, [isStarted, isReset]);
 
   return (
-    <div className="Stopwatch">
-      <div className="Stopwatch-display">
-        <h2 className="Stopwatch-srOnlyHeader">총 공부시간</h2>
-        <div className="Stopwatch-totalStudyTime">
-          <span>
-            {getDisplayTime(hours)}:{getDisplayTime(minutes)}:
-            {getDisplayTime(seconds)}
-          </span>
-        </div>
-      </div>
+    <main className="Stopwatch">
+      <h1 className="srOnly">스톱워치 앱</h1>
 
-      <div className="buttonGroup">
-        {isStarted || seconds || minutes || hours ? (
-          <button
-            type="button"
-            onClick={() => {
-              setHours(0);
-              setMinutes(0);
-              setSeconds(0);
-              setIsStarted(false);
-              setIsResumed(false);
-              setIsReset(true);
-              setRecords({ type: 'reset' });
-            }}
-          >
-            리셋
-          </button>
-        ) : null}
+      <section>
+        <h2 className="srOnly">스톱워치</h2>
 
-        {isStarted ? (
-          <button
-            className="Stopwatch-pauseButton"
-            type="button"
-            onClick={() => {
-              setIsStarted(false);
-              setIsReset(false);
-              setRecords({ type: 'add', hours, minutes, seconds });
-            }}
-          >
-            일시정지
-          </button>
-        ) : (
-          <button
-            className="Stopwatch-startButton"
-            type="button"
-            onClick={() => {
-              setIsStarted(true);
-              setIsResumed(true);
-              setIsReset(false);
-            }}
-          >
-            {/* "시작"은 단 한 번만 나타나고 초기화 하기 전까지 "계속"이 나타남 */}
-            {isResumed ? '계속' : '시작'}
-          </button>
-        )}
-      </div>
+        <p className="Stopwatch-stopwatchDisplay">
+          {getDisplayTime(hours)}:{getDisplayTime(minutes)}:
+          {getDisplayTime(seconds)}
+        </p>
 
-      <table>
-        <thead>
-          <tr>
-            <th>구간</th>
-            <th>공부시간</th>
-            <th>순공부시간</th>
-          </tr>
-        </thead>
-        <tbody>
-          {records.map(
-            ({
-              hours,
-              minutes,
-              seconds,
-              net_hours,
-              net_minutes,
-              net_seconds,
-              checkpoint,
-            }) => (
-              <tr key={checkpoint}>
-                <td>{checkpoint}</td>
-                <td>
-                  <span>
-                    {getDisplayTime(hours)}:{getDisplayTime(minutes)}:
-                    {getDisplayTime(seconds)}
-                  </span>
-                </td>
-                <td>
-                  <span>
-                    {getDisplayTime(net_hours)}:{getDisplayTime(net_minutes)}:
-                    {getDisplayTime(net_seconds)}
-                  </span>
-                </td>
-              </tr>
-            )
+        <div className="Stopwatch-buttonGroup">
+          {isStarted || seconds || minutes || hours ? (
+            <button
+              className="Stopwatch-resetButton"
+              type="button"
+              onClick={() => {
+                setHours(0);
+                setMinutes(0);
+                setSeconds(0);
+                setIsStarted(false);
+                setIsResumed(false);
+                setIsReset(true);
+                setRecords({ type: 'reset' });
+              }}
+            >
+              리셋
+            </button>
+          ) : null}
+
+          {isStarted ? (
+            <button
+              className="Stopwatch-pauseButton"
+              type="button"
+              onClick={() => {
+                setIsStarted(false);
+                setIsReset(false);
+                setRecords({ type: 'add', hours, minutes, seconds });
+              }}
+            >
+              일시정지
+            </button>
+          ) : (
+            <button
+              className="Stopwatch-startButton"
+              type="button"
+              onClick={() => {
+                setIsStarted(true);
+                setIsResumed(true);
+                setIsReset(false);
+              }}
+            >
+              {/* "시작"은 단 한 번만 나타나고 초기화 하기 전까지 "계속"이 나타남 */}
+              {isResumed ? '계속' : '시작'}
+            </button>
           )}
-        </tbody>
-      </table>
-    </div>
+        </div>
+      </section>
+
+      <section>
+        <h2 className="Stopwatch-srOnlyHeader">공부기록</h2>
+
+        <table>
+          <thead>
+            <tr>
+              <th>구간</th>
+              <th>공부시간</th>
+              <th>순공부시간</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {records.map(
+              ({
+                hours,
+                minutes,
+                seconds,
+                net_hours,
+                net_minutes,
+                net_seconds,
+                checkpoint,
+              }) => (
+                <tr key={checkpoint}>
+                  <td>{checkpoint}</td>
+                  <td>
+                    <span>
+                      {getDisplayTime(hours)}:{getDisplayTime(minutes)}:
+                      {getDisplayTime(seconds)}
+                    </span>
+                  </td>
+                  <td>
+                    <span>
+                      {getDisplayTime(net_hours)}:{getDisplayTime(net_minutes)}:
+                      {getDisplayTime(net_seconds)}
+                    </span>
+                  </td>
+                </tr>
+              )
+            )}
+          </tbody>
+        </table>
+      </section>
+    </main>
   );
 }

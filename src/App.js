@@ -5,9 +5,7 @@ import './App.css';
 function App() {
   return (
     <div className="App" aria-live="assertive">
-      <main>
-        <Stopwatch />
-      </main>
+      <Stopwatch />
     </div>
   );
 }
