@@ -120,14 +120,14 @@ export default function (props) {
       let buttonClickedTime = getNow();
       let prevRunningTime = runningTimeRef.current;
       let elapsed = buttonClickedTime - prevRunningTime;
-      let now;
+      let runningTime;
       // 컴포넌트가 화면에 painting 될 때마다 실행될 함수
       function timer() {
         // timer 함수가 실행될 때마다
         // 현재시간에서 elapsed를 빼줌으로써
         // 타이머가 실행된 시간만 계산하게 됨
-        now = getNow() - elapsed;
-        let nowAsSec = MiliSecondsToSeconds(now);
+        runningTime = getNow() - elapsed;
+        let nowAsSec = MiliSecondsToSeconds(runningTime);
         // 초로 표현된 시간값을 시, 분, 초값으로 변환
         const hours = getHours(nowAsSec);
         const minutes = getMinutes(nowAsSec, hours);
@@ -143,8 +143,8 @@ export default function (props) {
       rAF = requestAnimationFrame(timer);
 
       return () => {
-        // 러닝타임에 타이머가 실행된 시간을 저장
-        runningTimeRef.current = now;
+        // 러닝타임 레퍼런스에 타이머가 실행된 시간을 저장
+        runningTimeRef.current = runningTime;
         cancelAnimationFrame(rAF);
       };
     }
