@@ -3,7 +3,7 @@ import React, { useState, useLayoutEffect, useRef, useReducer } from 'react';
 // performance가 존재하지 않으면 Date로 대체
 const timeObject = typeof performance === 'object' ? performance : Date;
 const getNow = () => timeObject.now();
-const MiliSecondsToSeconds = (miliseconds) => Math.floor(miliseconds / 1000);
+const miliSecondsToSeconds = (miliseconds) => Math.floor(miliseconds / 1000);
 
 // getHours, getMinutes, getSeconds는 초로 표현된 시간값과
 // 여기서 구해진 시, 분을을 입력값으로 받아
@@ -25,13 +25,15 @@ const getDisplayTime = (number) => {
 // recordsReducer는 일시정지 버튼이 클릭될 때마다 클릭된 시간을 기록
 // 또는 리셋 버튼이 클릭될 경우 모든 기록을 삭제
 const recordsReducer = (state, action) => {
-  const { type, hours, minutes, seconds } = action;
+  const { type, hours, minutes, seconds, pauseTime } = action;
+  let newState;
+  let lastElement;
 
   switch (type) {
     case 'reset':
       return [];
     case 'add':
-      const newState = state.map((el) => el);
+      newState = state.map((el) => el);
       if (newState.length === 0) {
         // net이 붙은 prop들은 순공부시간을 의미
         // net이 붙지 않은 prop들은 일시정지가 눌렸을 때의 시간을 의미
@@ -47,7 +49,7 @@ const recordsReducer = (state, action) => {
           net_seconds: seconds,
         });
       } else {
-        const lastElement = newState[newState.length - 1];
+        lastElement = newState[newState.length - 1];
         // 현재 타이머에 표시된 시간과 기록되는 시간이
         // 같지 않으면 isChanged는 true, 같으면 false
         const isChanged =
@@ -87,6 +89,32 @@ const recordsReducer = (state, action) => {
       }
 
       return newState;
+    case 'restTime':
+      if (pauseTime === null) {
+        return state;
+      }
+
+      newState = state.map((el) => el);
+      let restTime = miliSecondsToSeconds(getNow()) - pauseTime;
+      const restTime_hours = getHours(restTime);
+      const restTime_minutes = getMinutes(restTime, restTime_hours);
+      const restTime_seconds = getSeconds(
+        restTime,
+        restTime_hours,
+        restTime_minutes
+      );
+
+      // 마지막 기록에 휴식 시, 분, 초를
+      lastElement = newState[newState.length - 1];
+      lastElement = {
+        ...lastElement,
+        restTime_hours,
+        restTime_minutes,
+        restTime_seconds,
+      };
+      newState[newState.length - 1] = lastElement;
+
+      return newState;
     default:
       return state;
   }
@@ -99,6 +127,7 @@ export default function (props) {
   const [hours, setHours] = useState(0);
   const [minutes, setMinutes] = useState(0);
   const [seconds, setSeconds] = useState(0);
+  const [pauseTime, setPauseTime] = useState(null);
   const [isStarted, setIsStarted] = useState(false);
   const [isResumed, setIsResumed] = useState(false);
   const [isReset, setIsReset] = useState(false);
@@ -111,6 +140,7 @@ export default function (props) {
     if (!isStarted && isReset) {
       runningTimeRef.current = mountTimeRef.current;
     }
+
     // 시작 버튼이 클릭되면 실행
     if (isStarted) {
       let rAF;
@@ -127,7 +157,7 @@ export default function (props) {
         // 현재시간에서 elapsed를 빼줌으로써
         // 타이머가 실행된 시간만 계산하게 됨
         runningTime = getNow() - elapsed;
-        let nowAsSec = MiliSecondsToSeconds(runningTime);
+        let nowAsSec = miliSecondsToSeconds(runningTime);
         // 초로 표현된 시간값을 시, 분, 초값으로 변환
         const hours = getHours(nowAsSec);
         const minutes = getMinutes(nowAsSec, hours);
@@ -188,6 +218,7 @@ export default function (props) {
               onClick={() => {
                 setIsStarted(false);
                 setIsReset(false);
+                setPauseTime(miliSecondsToSeconds(getNow()));
                 setRecords({ type: 'add', hours, minutes, seconds });
               }}
             >
@@ -201,6 +232,10 @@ export default function (props) {
                 setIsStarted(true);
                 setIsResumed(true);
                 setIsReset(false);
+                setRecords({
+                  type: 'restTime',
+                  pauseTime,
+                });
               }}
             >
               {/* "시작"은 단 한 번만 나타나고 초기화 하기 전까지 "계속"이 나타남 */}
@@ -216,9 +251,10 @@ export default function (props) {
         <table>
           <thead>
             <tr>
-              <th>구간</th>
-              <th>공부시간</th>
+              <th>기록</th>
+              <th>누적공부시간</th>
               <th>순공부시간</th>
+              <th>휴식시간</th>
             </tr>
           </thead>
 
@@ -232,6 +268,9 @@ export default function (props) {
                 net_minutes,
                 net_seconds,
                 checkpoint,
+                restTime_hours,
+                restTime_minutes,
+                restTime_seconds,
               }) => (
                 <tr key={checkpoint}>
                   <td>{checkpoint}</td>
@@ -246,6 +285,16 @@ export default function (props) {
                       {getDisplayTime(net_hours)}:{getDisplayTime(net_minutes)}:
                       {getDisplayTime(net_seconds)}
                     </span>
+                  </td>
+                  <td>
+                    {/* restTime_hours가 undefined가 아니면 나머지 restTime들도 undefined가 아니므로 restTime_hours만 사용 */}
+                    {restTime_hours !== undefined && (
+                      <span>
+                        {getDisplayTime(restTime_hours)}:
+                        {getDisplayTime(restTime_minutes)}:
+                        {getDisplayTime(restTime_seconds)}
+                      </span>
+                    )}
                   </td>
                 </tr>
               )
