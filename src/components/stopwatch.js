@@ -104,7 +104,7 @@ const recordsReducer = (state, action) => {
         restTime_minutes
       );
 
-      // 마지막 기록에 휴식 시, 분, 초를
+      // 마지막 기록에 휴식 시, 분, 초를 추가
       lastElement = newState[newState.length - 1];
       lastElement = {
         ...lastElement,
@@ -120,6 +120,7 @@ const recordsReducer = (state, action) => {
   }
 };
 
+// TODO 휴식시간을 따로 표시해주는 타이머 구현하기
 export default function (props) {
   // getNow 함수를 이용하는 이유는 performance.now()를 사용할 수 없을 경우 Date.now()를 사용하기 위함
   const mountTimeRef = useRef(getNow()); // 컴포넌트가 마운트 되었을 때의 시간
@@ -127,6 +128,9 @@ export default function (props) {
   const [hours, setHours] = useState(0);
   const [minutes, setMinutes] = useState(0);
   const [seconds, setSeconds] = useState(0);
+  const [restHours, setRestHours] = useState(0);
+  const [restMinutes, setRestMinutes] = useState(0);
+  const [restSeconds, setRestSeconds] = useState(0);
   const [pauseTime, setPauseTime] = useState(null);
   const [isStarted, setIsStarted] = useState(false);
   const [isResumed, setIsResumed] = useState(false);
@@ -135,21 +139,22 @@ export default function (props) {
 
   // useEffect 사용시 일시정지, 시작버튼을 빠르게 연속클릭할 시
   // 정지되어야 할 상황에서도 타이머가 계속 실행됨
+  // 공부시간을 측정하기 위한 이펙트
   useLayoutEffect(() => {
     // 리셋버튼이 눌릴 시 타이머 실행시간을 초기화하기 위함
     if (!isStarted && isReset) {
       runningTimeRef.current = mountTimeRef.current;
     }
 
-    // 시작 버튼이 클릭되면 실행
-    if (isStarted) {
+    // 시작 버튼 또는 계속 버튼이 클릭되면 실행
+    if (isStarted & isResumed) {
       let rAF;
 
       // 시작 버튼이 클릭된 시간에서 타이머가 실행된 시간을 뺌
       // 처음 클릭 시에는 컴포넌트가 마운트된 시간이 빠짐 왜냐하면 실행시간의 초기값이 마운트시간이기 때문
-      let buttonClickedTime = getNow();
-      let prevRunningTime = runningTimeRef.current;
-      let elapsed = buttonClickedTime - prevRunningTime;
+      const buttonClickedTime = getNow();
+      const prevRunningTime = runningTimeRef.current;
+      const elapsed = buttonClickedTime - prevRunningTime;
       let runningTime;
       // 컴포넌트가 화면에 painting 될 때마다 실행될 함수
       function timer() {
@@ -157,7 +162,7 @@ export default function (props) {
         // 현재시간에서 elapsed를 빼줌으로써
         // 타이머가 실행된 시간만 계산하게 됨
         runningTime = getNow() - elapsed;
-        let nowAsSec = miliSecondsToSeconds(runningTime);
+        const nowAsSec = miliSecondsToSeconds(runningTime);
         // 초로 표현된 시간값을 시, 분, 초값으로 변환
         const hours = getHours(nowAsSec);
         const minutes = getMinutes(nowAsSec, hours);
@@ -178,20 +183,63 @@ export default function (props) {
         cancelAnimationFrame(rAF);
       };
     }
-  }, [isStarted, isReset]);
+  }, [isStarted, isReset, isResumed]);
+
+  // 휴식시간을 측정하기 위한 이펙트
+  useLayoutEffect(() => {
+    // 시작된 후 일시정지 버튼이 클릭되었을 경우 휴식시간을 측정하기 위한 조건문
+    if (isStarted && !isResumed) {
+      let rAF;
+
+      const buttonClickedTime = getNow();
+      function timer() {
+        const restTime = getNow() - buttonClickedTime;
+        const restTimeAsSec = miliSecondsToSeconds(restTime);
+
+        const restHours = getHours(restTimeAsSec);
+        const restMinutes = getMinutes(restTimeAsSec, restHours);
+        const restSeconds = getSeconds(restTimeAsSec, restHours, restMinutes);
+
+        setRestHours(restHours);
+        setRestMinutes(restMinutes);
+        setRestSeconds(restSeconds);
+
+        rAF = requestAnimationFrame(timer);
+      }
+
+      rAF = requestAnimationFrame(timer);
+
+      return () => {
+        cancelAnimationFrame(rAF);
+      };
+    }
+  }, [isStarted, isResumed]);
 
   return (
     <main className="Stopwatch">
       <h1 className="srOnly">스톱워치 앱</h1>
 
+      {isStarted && !isResumed ? (
+        <section>
+          <h2>휴식시간</h2>
+
+          <p className="Stopwatch-stopwatchDisplay">
+            {getDisplayTime(restHours)}:{getDisplayTime(restMinutes)}:
+            {getDisplayTime(restSeconds)}
+          </p>
+        </section>
+      ) : (
+        <section>
+          <h2>공부시간</h2>
+
+          <p className="Stopwatch-stopwatchDisplay">
+            {getDisplayTime(hours)}:{getDisplayTime(minutes)}:
+            {getDisplayTime(seconds)}
+          </p>
+        </section>
+      )}
+
       <section>
-        <h2 className="srOnly">스톱워치</h2>
-
-        <p className="Stopwatch-stopwatchDisplay">
-          {getDisplayTime(hours)}:{getDisplayTime(minutes)}:
-          {getDisplayTime(seconds)}
-        </p>
-
         <div className="Stopwatch-buttonGroup">
           {isStarted || seconds || minutes || hours ? (
             <button
@@ -201,6 +249,9 @@ export default function (props) {
                 setHours(0);
                 setMinutes(0);
                 setSeconds(0);
+                setRestHours(0);
+                setRestMinutes(0);
+                setRestSeconds(0);
                 setIsStarted(false);
                 setIsResumed(false);
                 setIsReset(true);
@@ -211,18 +262,18 @@ export default function (props) {
             </button>
           ) : null}
 
-          {isStarted ? (
+          {isResumed ? (
             <button
               className="Stopwatch-pauseButton"
               type="button"
               onClick={() => {
-                setIsStarted(false);
+                setIsResumed(false);
                 setIsReset(false);
                 setPauseTime(miliSecondsToSeconds(getNow()));
                 setRecords({ type: 'add', hours, minutes, seconds });
               }}
             >
-              일시정지
+              휴식
             </button>
           ) : (
             <button
@@ -232,14 +283,14 @@ export default function (props) {
                 setIsStarted(true);
                 setIsResumed(true);
                 setIsReset(false);
+                // 휴식시간은 계속 버튼이 눌릴 때 측정됨
                 setRecords({
                   type: 'restTime',
                   pauseTime,
                 });
               }}
             >
-              {/* "시작"은 단 한 번만 나타나고 초기화 하기 전까지 "계속"이 나타남 */}
-              {isResumed ? '계속' : '시작'}
+              공부
             </button>
           )}
         </div>
