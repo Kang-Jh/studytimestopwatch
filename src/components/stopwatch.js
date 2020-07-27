@@ -219,27 +219,27 @@ export default function (props) {
     <main className="Stopwatch">
       <h1 className="srOnly">스톱워치 앱</h1>
 
-      {isStarted && !isResumed ? (
-        <section>
-          <h2>휴식시간</h2>
-
-          <p className="Stopwatch-stopwatchDisplay">
-            {getDisplayTime(restHours)}:{getDisplayTime(restMinutes)}:
-            {getDisplayTime(restSeconds)}
-          </p>
-        </section>
-      ) : (
-        <section>
-          <h2>공부시간</h2>
-
-          <p className="Stopwatch-stopwatchDisplay">
-            {getDisplayTime(hours)}:{getDisplayTime(minutes)}:
-            {getDisplayTime(seconds)}
-          </p>
-        </section>
-      )}
-
       <section>
+        {isStarted && !isResumed ? (
+          <>
+            <h2>휴식시간</h2>
+
+            <div className="Stopwatch-stopwatchDisplay">
+              {getDisplayTime(restHours)}:{getDisplayTime(restMinutes)}:
+              {getDisplayTime(restSeconds)}
+            </div>
+          </>
+        ) : (
+          <>
+            <h2>공부시간</h2>
+
+            <div className="Stopwatch-stopwatchDisplay">
+              {getDisplayTime(hours)}:{getDisplayTime(minutes)}:
+              {getDisplayTime(seconds)}
+            </div>
+          </>
+        )}
+
         <div className="Stopwatch-buttonGroup">
           {isStarted || seconds || minutes || hours ? (
             <button
