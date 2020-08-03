@@ -1,4 +1,6 @@
 import React, { useState, useLayoutEffect, useRef, useReducer } from 'react';
+import Modal from './modal';
+import '../styles/stopwatch.css';
 
 // performance가 존재하지 않으면 Date로 대체
 const timeObject = typeof performance === 'object' ? performance : Date;
@@ -49,6 +51,7 @@ const recordsReducer = (state, action) => {
           net_seconds: seconds,
         });
       } else {
+        newState = state.map((el) => el);
         lastElement = newState[newState.length - 1];
         // 현재 타이머에 표시된 시간과 기록되는 시간이
         // 같지 않으면 isChanged는 true, 같으면 false
@@ -64,19 +67,16 @@ const recordsReducer = (state, action) => {
           return state;
         }
 
-        // 현재 타이머에 표시된 시간에서 마지막으로 표시된 시간을 뺀 값을 초로 표시한 값
-        const net_studyTime =
+        const net_studytime =
           hours * 3600 +
           minutes * 60 +
           seconds -
           (lastElement.hours * 3600 +
             lastElement.minutes * 60 +
             lastElement.seconds);
-
-        // 초로 표시된 시간값을 시, 분, 초로 변환
-        const net_hours = getHours(net_studyTime);
-        const net_minutes = getMinutes(net_studyTime, net_hours);
-        const net_seconds = getSeconds(net_studyTime, net_hours, net_minutes);
+        const net_hours = getHours(net_studytime);
+        const net_minutes = getMinutes(net_studytime, net_hours);
+        const net_seconds = getSeconds(net_studytime, net_hours, net_minutes);
         newState.push({
           checkpoint: lastElement.checkpoint + 1,
           hours,
@@ -95,6 +95,7 @@ const recordsReducer = (state, action) => {
       }
 
       newState = state.map((el) => el);
+
       let restTime = miliSecondsToSeconds(getNow()) - pauseTime;
       const restTime_hours = getHours(restTime);
       const restTime_minutes = getMinutes(restTime, restTime_hours);
@@ -112,6 +113,7 @@ const recordsReducer = (state, action) => {
         restTime_minutes,
         restTime_seconds,
       };
+
       newState[newState.length - 1] = lastElement;
 
       return newState;
@@ -135,6 +137,8 @@ export default function (props) {
   const [isStarted, setIsStarted] = useState(false);
   const [isResumed, setIsResumed] = useState(false);
   const [isReset, setIsReset] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+  const [heading, setHeading] = useState('');
   const [records, setRecords] = useReducer(recordsReducer, []);
 
   // useEffect 사용시 일시정지, 시작버튼을 빠르게 연속클릭할 시
@@ -146,7 +150,7 @@ export default function (props) {
       runningTimeRef.current = mountTimeRef.current;
     }
 
-    // 시작 버튼 또는 계속 버튼이 클릭되면 실행
+    // 공부하기 버튼이 클릭되면 실행
     if (isStarted & isResumed) {
       let rAF;
 
@@ -216,13 +220,13 @@ export default function (props) {
   }, [isStarted, isResumed]);
 
   return (
-    <main className="Stopwatch">
-      <h1 className="srOnly">스톱워치 앱</h1>
+    <main className="Stopwatch-main">
+      <h2 className="srOnly">스톱워치</h2>
 
       <section>
         {isStarted && !isResumed ? (
           <>
-            <h2>휴식시간</h2>
+            <h3 className="Stopwatch-sectionHeader">휴식중...</h3>
 
             <div className="Stopwatch-stopwatchDisplay">
               {getDisplayTime(restHours)}:{getDisplayTime(restMinutes)}:
@@ -231,7 +235,13 @@ export default function (props) {
           </>
         ) : (
           <>
-            <h2>공부시간</h2>
+            {/* 초기 상태 또는 리셋 상태일 경우 스크린 리더들에게만 보이는 헤딩을 보여줌 */}
+            {/* 공부하기가 클릭된 경우 공부중... 이라는 헤딩을 보여줌  */}
+            {isStarted ? (
+              <h3 className="Stopwatch-sectionHeader">공부중...</h3>
+            ) : (
+              <h3 className="srOnly">스톱워치 디스플레이</h3>
+            )}
 
             <div className="Stopwatch-stopwatchDisplay">
               {getDisplayTime(hours)}:{getDisplayTime(minutes)}:
@@ -273,7 +283,7 @@ export default function (props) {
                 setRecords({ type: 'add', hours, minutes, seconds });
               }}
             >
-              휴식
+              휴식하기
             </button>
           ) : (
             <button
@@ -283,28 +293,60 @@ export default function (props) {
                 setIsStarted(true);
                 setIsResumed(true);
                 setIsReset(false);
-                // 휴식시간은 계속 버튼이 눌릴 때 측정됨
+                // 휴식시간은 공부하기 버튼이 클릭될 때 측정됨
                 setRecords({
                   type: 'restTime',
                   pauseTime,
                 });
               }}
             >
-              공부
+              공부하기
             </button>
           )}
         </div>
       </section>
 
-      <section>
-        <h2 className="Stopwatch-srOnlyHeader">공부기록</h2>
+      <section className="Stopwatch-studyRecords-section">
+        <h3 className="srOnly">공부기록</h3>
+
+        <div className="Stopwatch-saveButton-div">
+          <button
+            onClick={() => {
+              // 한 번이라도 스톱워치가 공부시간을 측정하지 않은 경우
+              if (!isStarted) {
+                alert('공부 기록이 존재하지 않습니다');
+                return;
+              }
+
+              if (isResumed) {
+                // 현재 공부시간을 측정 중인 경우
+                // 공부시간을 기록하고
+                // 일시정지 시간에 현재 시간을 저장
+                setRecords({ type: 'add', hours, minutes, seconds });
+                setPauseTime(miliSecondsToSeconds(getNow()));
+              } else {
+                // 현재 휴식시간을 측정 중인 경우
+                // 휴식시간을 기록하고
+                // 일시정지 시간을 null로 저장
+                // 일시정지 시간을 null로 저장함으로써
+                // 공부하기 버튼이 다시 클릭됐을 때 마지막 휴식시간을 변경하지 않음
+                setRecords({ type: 'restTime', pauseTime });
+                setPauseTime(null);
+              }
+              setIsStarted(false);
+              setIsResumed(false);
+              setIsOpen(true);
+            }}
+          >
+            저장하기
+          </button>
+        </div>
 
         <table>
           <thead>
             <tr>
-              <th>기록</th>
-              <th>누적공부시간</th>
-              <th>순공부시간</th>
+              <th>교시</th>
+              <th>공부시간</th>
               <th>휴식시간</th>
             </tr>
           </thead>
@@ -312,9 +354,6 @@ export default function (props) {
           <tbody>
             {records.map(
               ({
-                hours,
-                minutes,
-                seconds,
                 net_hours,
                 net_minutes,
                 net_seconds,
@@ -325,34 +364,63 @@ export default function (props) {
               }) => (
                 <tr key={checkpoint}>
                   <td>{checkpoint}</td>
-                  <td>
-                    <span>
-                      {getDisplayTime(hours)}:{getDisplayTime(minutes)}:
-                      {getDisplayTime(seconds)}
-                    </span>
-                  </td>
+
                   <td>
                     <span>
                       {getDisplayTime(net_hours)}:{getDisplayTime(net_minutes)}:
                       {getDisplayTime(net_seconds)}
                     </span>
                   </td>
-                  <td>
-                    {/* restTime_hours가 undefined가 아니면 나머지 restTime들도 undefined가 아니므로 restTime_hours만 사용 */}
-                    {restTime_hours !== undefined && (
+
+                  {/* restTime_hours가 undefined가 아니면 나머지 restTime들도 undefined가 아니므로 restTime_hours만 사용 */}
+                  {restTime_hours !== undefined && (
+                    <td>
                       <span>
                         {getDisplayTime(restTime_hours)}:
                         {getDisplayTime(restTime_minutes)}:
                         {getDisplayTime(restTime_seconds)}
                       </span>
-                    )}
-                  </td>
+                    </td>
+                  )}
                 </tr>
               )
             )}
           </tbody>
         </table>
       </section>
+
+      <Modal isOpen={isOpen}>
+        <section>
+          <h3 className="srOnly">공부기록 저장하기</h3>
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+            }}
+          >
+            <div>
+              <label htmlFor="heading">제목</label>
+              <input
+                type="text"
+                id="heading"
+                value={heading}
+                onChange={(e) => setHeading(e.target.value)}
+              />
+            </div>
+            <div>
+              <button type="submit">저장</button>
+              <button
+                type="button"
+                onClick={() => {
+                  setHeading('');
+                  setIsOpen(false);
+                }}
+              >
+                취소
+              </button>
+            </div>
+          </form>
+        </section>
+      </Modal>
     </main>
   );
 }
