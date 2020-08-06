@@ -1,0 +1,38 @@
+.Stopwatch-main {
+  padding: 50px;
+  margin: 50px;
+}
+
+.Stopwatch-sectionHeader {
+  font-size: 40px;
+  margin-bottom: 0;
+}
+
+.Stopwatch-stopwatchDisplay {
+  font-size: 150px;
+}
+
+.Stopwatch-saveButton-div {
+  text-align: right;
+}
+
+.Stopwatch-studyRecords-section {
+  width: 50%;
+  margin: auto;
+  margin-top: 100px;
+}
+
+.Stopwatch-saveRecordsForm {
+  text-align: center;
+}
+
+.Stopwatch-saveRecordsForm h3,
+.Stopwatch-saveRecordsForm-buttonDiv {
+  margin: 0;
+  padding: 30px;
+  background-color: #ff5555;
+}
+
+.Stopwatch-saveRecordsForm-inputDiv {
+  padding: 150px 0;
+}
