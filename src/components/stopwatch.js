@@ -7,14 +7,19 @@ const timeObject = typeof performance === 'object' ? performance : Date;
 const getNow = () => timeObject.now();
 const miliSecondsToSeconds = (miliseconds) => Math.floor(miliseconds / 1000);
 
-// getHours, getMinutes, getSeconds는 초로 표현된 시간값과
-// 여기서 구해진 시, 분을을 입력값으로 받아
+// getTime는 초로 표현된 시간값을 입력값으로 받아
 // 몇 시간, 몇 분, 몇 초인지를 구할 수 있게 해줌
-const getHours = (timeAsSec) => Math.floor(timeAsSec / 3600);
-const getMinutes = (timeAsSec, hours) =>
-  Math.floor((timeAsSec - hours * 3600) / 60);
-const getSeconds = (timeAsSec, hours, minutes) =>
-  timeAsSec - hours * 3600 - minutes * 60;
+const getTime = (timeAsSec) => {
+  const hours = Math.floor(timeAsSec / 3600);
+  const minutes = Math.floor((timeAsSec - hours * 3600) / 60);
+  const seconds = timeAsSec - hours * 3600 - minutes * 60;
+
+  return {
+    hours,
+    minutes,
+    seconds,
+  };
+};
 
 // 입력값이 10보다 작으면 앞에 0을 붙인 문자열을 return
 // 입력값이 10 이상이면 입력값을 그대로 return
@@ -58,9 +63,7 @@ const recordsReducer = (state, action) => {
         const isChanged =
           lastElement.hours !== hours ||
           lastElement.minutes !== minutes ||
-          lastElement.seconds !== seconds
-            ? true
-            : false;
+          lastElement.seconds !== seconds;
 
         // 변하지 않았으면 state를 return
         if (!isChanged) {
@@ -74,9 +77,12 @@ const recordsReducer = (state, action) => {
           (lastElement.hours * 3600 +
             lastElement.minutes * 60 +
             lastElement.seconds);
-        const net_hours = getHours(net_studytime);
-        const net_minutes = getMinutes(net_studytime, net_hours);
-        const net_seconds = getSeconds(net_studytime, net_hours, net_minutes);
+
+        const {
+          hours: net_hours,
+          minutes: net_minutes,
+          seconds: net_seconds,
+        } = getTime(net_studytime);
         newState.push({
           checkpoint: lastElement.checkpoint + 1,
           hours,
@@ -97,22 +103,24 @@ const recordsReducer = (state, action) => {
       newState = state.map((el) => el);
 
       let restTime = miliSecondsToSeconds(getNow()) - pauseTime;
-      const restTime_hours = getHours(restTime);
-      const restTime_minutes = getMinutes(restTime, restTime_hours);
-      const restTime_seconds = getSeconds(
-        restTime,
-        restTime_hours,
-        restTime_minutes
-      );
+      const {
+        hours: restTime_hours,
+        minutes: restTime_minutes,
+        seconds: restTime_seconds,
+      } = getTime(restTime);
 
-      // 마지막 기록에 휴식 시, 분, 초를 추가
+      // 마지막 기록에 휴식시간이 존재하지 않으면
+      // 휴식시간을 기록에 추가
+      // 이미 존재하면 휴식시간을 수정하지 않음
       lastElement = newState[newState.length - 1];
-      lastElement = {
-        ...lastElement,
-        restTime_hours,
-        restTime_minutes,
-        restTime_seconds,
-      };
+      if (lastElement && lastElement.restTime_hours === undefined) {
+        lastElement = {
+          ...lastElement,
+          restTime_hours,
+          restTime_minutes,
+          restTime_seconds,
+        };
+      }
 
       newState[newState.length - 1] = lastElement;
 
@@ -168,9 +176,7 @@ export default function (props) {
         runningTime = getNow() - elapsed;
         const nowAsSec = miliSecondsToSeconds(runningTime);
         // 초로 표현된 시간값을 시, 분, 초값으로 변환
-        const hours = getHours(nowAsSec);
-        const minutes = getMinutes(nowAsSec, hours);
-        const seconds = getSeconds(nowAsSec, hours, minutes);
+        const { hours, minutes, seconds } = getTime(nowAsSec);
 
         setHours(hours);
         setMinutes(minutes);
@@ -200,9 +206,11 @@ export default function (props) {
         const restTime = getNow() - buttonClickedTime;
         const restTimeAsSec = miliSecondsToSeconds(restTime);
 
-        const restHours = getHours(restTimeAsSec);
-        const restMinutes = getMinutes(restTimeAsSec, restHours);
-        const restSeconds = getSeconds(restTimeAsSec, restHours, restMinutes);
+        const {
+          hours: restHours,
+          minutes: restMinutes,
+          seconds: restSeconds,
+        } = getTime(restTimeAsSec);
 
         setRestHours(restHours);
         setRestMinutes(restMinutes);
@@ -313,7 +321,7 @@ export default function (props) {
           <button
             onClick={() => {
               // 한 번이라도 스톱워치가 공부시간을 측정하지 않은 경우
-              if (!isStarted) {
+              if (records.length === 0 && !isStarted) {
                 alert('공부 기록이 존재하지 않습니다');
                 return;
               }
@@ -390,36 +398,37 @@ export default function (props) {
       </section>
 
       <Modal isOpen={isOpen}>
-        <section>
-          <h3 className="srOnly">공부기록 저장하기</h3>
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-            }}
-          >
-            <div>
-              <label htmlFor="heading">제목</label>
-              <input
-                type="text"
-                id="heading"
-                value={heading}
-                onChange={(e) => setHeading(e.target.value)}
-              />
-            </div>
-            <div>
-              <button type="submit">저장</button>
-              <button
-                type="button"
-                onClick={() => {
-                  setHeading('');
-                  setIsOpen(false);
-                }}
-              >
-                취소
-              </button>
-            </div>
-          </form>
-        </section>
+        <form
+          className="Stopwatch-saveRecordsForm"
+          onSubmit={(e) => {
+            e.preventDefault();
+          }}
+        >
+          <h3>공부기록 저장</h3>
+
+          <div className="Stopwatch-saveRecordsForm-inputDiv">
+            <label htmlFor="heading">제목</label>
+            <input
+              type="text"
+              id="heading"
+              value={heading}
+              onChange={(e) => setHeading(e.target.value)}
+            />
+          </div>
+
+          <div className="Stopwatch-saveRecordsForm-buttonDiv">
+            <button type="submit">저장</button>
+            <button
+              type="button"
+              onClick={() => {
+                setHeading('');
+                setIsOpen(false);
+              }}
+            >
+              취소
+            </button>
+          </div>
+        </form>
       </Modal>
     </main>
   );
