@@ -2,17 +2,27 @@ import React, { useState, useLayoutEffect, useRef, useReducer } from 'react';
 import Modal from './modal';
 import '../styles/stopwatch.css';
 
+interface GetTimeReturn {
+  hours: number;
+  minutes: number;
+  seconds: number;
+}
+
 // performance가 존재하지 않으면 Date로 대체
-const timeObject = typeof performance === 'object' ? performance : Date;
-const getNow = () => timeObject.now();
-const miliSecondsToSeconds = (miliseconds) => Math.floor(miliseconds / 1000);
+const timeObject: any = typeof performance === 'object' ? performance : Date;
+const getNow: () => number = () => timeObject.now();
+const miliSecondsToSeconds: (miliseconds: number) => number = (
+  miliseconds: number
+): number => Math.floor(miliseconds / 1000);
 
 // getTime는 초로 표현된 시간값을 입력값으로 받아
 // 몇 시간, 몇 분, 몇 초인지를 구할 수 있게 해줌
-const getTime = (timeAsSec) => {
-  const hours = Math.floor(timeAsSec / 3600);
-  const minutes = Math.floor((timeAsSec - hours * 3600) / 60);
-  const seconds = timeAsSec - hours * 3600 - minutes * 60;
+const getTime: (timeAsSec: number) => GetTimeReturn = (
+  timeAsSec: number
+): GetTimeReturn => {
+  const hours: number = Math.floor(timeAsSec / 3600);
+  const minutes: number = Math.floor((timeAsSec - hours * 3600) / 60);
+  const seconds: number = timeAsSec - hours * 3600 - minutes * 60;
 
   return {
     hours,
@@ -25,13 +35,13 @@ const getTime = (timeAsSec) => {
 // 입력값이 10 이상이면 입력값을 그대로 return
 // 이로써 화면에 표시되는 시(또는 분 또는 초)가
 // 10보다 작을 경우 앞에 0을 붙인 값이 화면에 표시됨
-const getDisplayTime = (number) => {
+const getDisplayTime: (number: number) => string | number = (number) => {
   return number < 10 ? `0${number}` : number;
 };
 
 // recordsReducer는 일시정지 버튼이 클릭될 때마다 클릭된 시간을 기록
 // 또는 리셋 버튼이 클릭될 경우 모든 기록을 삭제
-const recordsReducer = (state, action) => {
+const recordsReducer = (state: any[], action: any) => {
   const { type, hours, minutes, seconds, pauseTime } = action;
   let newState;
   let lastElement;
@@ -82,7 +92,7 @@ const recordsReducer = (state, action) => {
           hours: net_hours,
           minutes: net_minutes,
           seconds: net_seconds,
-        } = getTime(net_studytime);
+        }: GetTimeReturn = getTime(net_studytime);
         newState.push({
           checkpoint: lastElement.checkpoint + 1,
           hours,
@@ -131,7 +141,7 @@ const recordsReducer = (state, action) => {
 };
 
 // TODO 휴식시간을 따로 표시해주는 타이머 구현하기
-export default function (props) {
+export default function (props: any) {
   // getNow 함수를 이용하는 이유는 performance.now()를 사용할 수 없을 경우 Date.now()를 사용하기 위함
   const mountTimeRef = useRef(getNow()); // 컴포넌트가 마운트 되었을 때의 시간
   const runningTimeRef = useRef(mountTimeRef.current); // 타이머 실행시간을 위한 ref로 초기값은 마운트된 시간
@@ -141,14 +151,13 @@ export default function (props) {
   const [restHours, setRestHours] = useState(0);
   const [restMinutes, setRestMinutes] = useState(0);
   const [restSeconds, setRestSeconds] = useState(0);
-  const [pauseTime, setPauseTime] = useState(null);
+  const [pauseTime, setPauseTime] = useState<number | null>(null);
   const [isStarted, setIsStarted] = useState(false);
   const [isResumed, setIsResumed] = useState(false);
   const [isReset, setIsReset] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [heading, setHeading] = useState('');
   const [records, setRecords] = useReducer(recordsReducer, []);
-
   // useEffect 사용시 일시정지, 시작버튼을 빠르게 연속클릭할 시
   // 정지되어야 할 상황에서도 타이머가 계속 실행됨
   // 공부시간을 측정하기 위한 이펙트
@@ -159,15 +168,15 @@ export default function (props) {
     }
 
     // 공부하기 버튼이 클릭되면 실행
-    if (isStarted & isResumed) {
-      let rAF;
+    if (isStarted && isResumed) {
+      let rAF: number;
 
       // 시작 버튼이 클릭된 시간에서 타이머가 실행된 시간을 뺌
       // 처음 클릭 시에는 컴포넌트가 마운트된 시간이 빠짐 왜냐하면 실행시간의 초기값이 마운트시간이기 때문
-      const buttonClickedTime = getNow();
-      const prevRunningTime = runningTimeRef.current;
-      const elapsed = buttonClickedTime - prevRunningTime;
-      let runningTime;
+      const buttonClickedTime: number = getNow();
+      const prevRunningTime: number = runningTimeRef.current;
+      const elapsed: number = buttonClickedTime - prevRunningTime;
+      let runningTime: number;
       // 컴포넌트가 화면에 painting 될 때마다 실행될 함수
       function timer() {
         // timer 함수가 실행될 때마다
@@ -176,7 +185,7 @@ export default function (props) {
         runningTime = getNow() - elapsed;
         const nowAsSec = miliSecondsToSeconds(runningTime);
         // 초로 표현된 시간값을 시, 분, 초값으로 변환
-        const { hours, minutes, seconds } = getTime(nowAsSec);
+        const { hours, minutes, seconds }: GetTimeReturn = getTime(nowAsSec);
 
         setHours(hours);
         setMinutes(minutes);
@@ -199,7 +208,7 @@ export default function (props) {
   useLayoutEffect(() => {
     // 시작된 후 일시정지 버튼이 클릭되었을 경우 휴식시간을 측정하기 위한 조건문
     if (isStarted && !isResumed) {
-      let rAF;
+      let rAF: number;
 
       const buttonClickedTime = getNow();
       function timer() {

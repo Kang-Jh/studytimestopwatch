@@ -1,9 +1,17 @@
-import { useRef, useEffect } from 'react';
-import ReactDOM from 'react-dom';
+import { useRef, useEffect, ReactElement } from 'react';
+import * as ReactDOM from 'react-dom';
 import '../styles/modal.css';
 
-const modalRoot = document.getElementById('modalRoot');
-export default function ({ isOpen, children }) {
+const modalRoot: HTMLElement = document.getElementById(
+  'modalRoot'
+) as HTMLElement;
+export default function ({
+  isOpen,
+  children,
+}: {
+  isOpen: boolean;
+  children: ReactElement;
+}) {
   const containerRef = useRef(document.createElement('div'));
 
   useEffect(() => {
