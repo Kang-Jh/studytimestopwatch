@@ -10,6 +10,7 @@ interface GetTimeReturn {
 
 // performance가 존재하지 않으면 Date로 대체
 const timeObject: any = typeof performance === 'object' ? performance : Date;
+// getNow 함수를 이용하는 이유는 performance.now()를 사용할 수 없을 경우 Date.now()를 사용하기 위함
 const getNow: () => number = () => timeObject.now();
 const miliSecondsToSeconds: (miliseconds: number) => number = (
   miliseconds: number
@@ -41,10 +42,22 @@ const getDisplayTime: (number: number) => string | number = (number) => {
 
 // recordsReducer는 일시정지 버튼이 클릭될 때마다 클릭된 시간을 기록
 // 또는 리셋 버튼이 클릭될 경우 모든 기록을 삭제
-const recordsReducer = (state: any[], action: any) => {
-  const { type, hours, minutes, seconds, pauseTime } = action;
-  let newState;
-  let lastElement;
+const recordsReducer = (state: any[], action: any): any[] => {
+  const {
+    type,
+    hours,
+    minutes,
+    seconds,
+    pauseTime,
+  }: {
+    type: string;
+    hours: number;
+    minutes: number;
+    seconds: number;
+    pauseTime: number;
+  } = action;
+  let newState: Array<any>;
+  let lastElement: any;
 
   switch (type) {
     case 'reset':
@@ -70,7 +83,7 @@ const recordsReducer = (state: any[], action: any) => {
         lastElement = newState[newState.length - 1];
         // 현재 타이머에 표시된 시간과 기록되는 시간이
         // 같지 않으면 isChanged는 true, 같으면 false
-        const isChanged =
+        const isChanged: boolean =
           lastElement.hours !== hours ||
           lastElement.minutes !== minutes ||
           lastElement.seconds !== seconds;
@@ -80,7 +93,7 @@ const recordsReducer = (state: any[], action: any) => {
           return state;
         }
 
-        const net_studytime =
+        const net_studytime: number =
           hours * 3600 +
           minutes * 60 +
           seconds -
@@ -112,12 +125,12 @@ const recordsReducer = (state: any[], action: any) => {
 
       newState = state.map((el) => el);
 
-      let restTime = miliSecondsToSeconds(getNow()) - pauseTime;
+      let restTime: number = miliSecondsToSeconds(getNow()) - pauseTime;
       const {
         hours: restTime_hours,
         minutes: restTime_minutes,
         seconds: restTime_seconds,
-      } = getTime(restTime);
+      }: GetTimeReturn = getTime(restTime);
 
       // 마지막 기록에 휴식시간이 존재하지 않으면
       // 휴식시간을 기록에 추가
@@ -142,8 +155,9 @@ const recordsReducer = (state: any[], action: any) => {
 
 // TODO 휴식시간을 따로 표시해주는 타이머 구현하기
 export default function (props: any) {
-  // getNow 함수를 이용하는 이유는 performance.now()를 사용할 수 없을 경우 Date.now()를 사용하기 위함
-  const mountTimeRef = useRef(getNow()); // 컴포넌트가 마운트 되었을 때의 시간
+  // 컴포넌트가 마운트 되었을 때의 시간으로
+  // 공부시간 측정의 기준값
+  const mountTimeRef = useRef(getNow());
   const runningTimeRef = useRef(mountTimeRef.current); // 타이머 실행시간을 위한 ref로 초기값은 마운트된 시간
   const [hours, setHours] = useState(0);
   const [minutes, setMinutes] = useState(0);
@@ -158,6 +172,7 @@ export default function (props: any) {
   const [isOpen, setIsOpen] = useState(false);
   const [heading, setHeading] = useState('');
   const [records, setRecords] = useReducer(recordsReducer, []);
+  const [localStorageKey, setLocalStorageKey] = useState<string | null>(null);
   // useEffect 사용시 일시정지, 시작버튼을 빠르게 연속클릭할 시
   // 정지되어야 할 상황에서도 타이머가 계속 실행됨
   // 공부시간을 측정하기 위한 이펙트
@@ -177,24 +192,26 @@ export default function (props: any) {
       const prevRunningTime: number = runningTimeRef.current;
       const elapsed: number = buttonClickedTime - prevRunningTime;
       let runningTime: number;
+
+      rAF = requestAnimationFrame(timer);
+
       // 컴포넌트가 화면에 painting 될 때마다 실행될 함수
-      function timer() {
+      function timer(): void {
         // timer 함수가 실행될 때마다
         // 현재시간에서 elapsed를 빼줌으로써
         // 타이머가 실행된 시간만 계산하게 됨
         runningTime = getNow() - elapsed;
-        const nowAsSec = miliSecondsToSeconds(runningTime);
+        const nowAsSec: number = miliSecondsToSeconds(runningTime);
         // 초로 표현된 시간값을 시, 분, 초값으로 변환
         const { hours, minutes, seconds }: GetTimeReturn = getTime(nowAsSec);
 
+        // 위에서 구한 시, 분, 초값을 state에 저장
         setHours(hours);
         setMinutes(minutes);
         setSeconds(seconds);
 
         rAF = requestAnimationFrame(timer);
       }
-
-      rAF = requestAnimationFrame(timer);
 
       return () => {
         // 러닝타임 레퍼런스에 타이머가 실행된 시간을 저장
@@ -205,21 +222,24 @@ export default function (props: any) {
   }, [isStarted, isReset, isResumed]);
 
   // 휴식시간을 측정하기 위한 이펙트
+  // 공부시간을 측정하는 이펙트와 거의 동일
   useLayoutEffect(() => {
-    // 시작된 후 일시정지 버튼이 클릭되었을 경우 휴식시간을 측정하기 위한 조건문
+    // 시작된 후 쉬기 버튼이 클릭되었을 경우 휴식시간을 측정하기 위한 조건문
     if (isStarted && !isResumed) {
       let rAF: number;
 
-      const buttonClickedTime = getNow();
-      function timer() {
-        const restTime = getNow() - buttonClickedTime;
-        const restTimeAsSec = miliSecondsToSeconds(restTime);
+      const buttonClickedTime: number = getNow();
+
+      rAF = requestAnimationFrame(timer);
+      function timer(): void {
+        const restTime: number = getNow() - buttonClickedTime;
+        const restTimeAsSec: number = miliSecondsToSeconds(restTime);
 
         const {
           hours: restHours,
           minutes: restMinutes,
           seconds: restSeconds,
-        } = getTime(restTimeAsSec);
+        }: GetTimeReturn = getTime(restTimeAsSec);
 
         setRestHours(restHours);
         setRestMinutes(restMinutes);
@@ -227,8 +247,6 @@ export default function (props: any) {
 
         rAF = requestAnimationFrame(timer);
       }
-
-      rAF = requestAnimationFrame(timer);
 
       return () => {
         cancelAnimationFrame(rAF);
@@ -267,10 +285,10 @@ export default function (props: any) {
           </>
         )}
 
-        <div className="Stopwatch-buttonGroup">
+        <div>
           {isStarted || seconds || minutes || hours ? (
             <button
-              className="Stopwatch-resetButton"
+              className="Stopwatch-button Stopwatch-background-white"
               type="button"
               onClick={() => {
                 setHours(0);
@@ -291,7 +309,7 @@ export default function (props: any) {
 
           {isResumed ? (
             <button
-              className="Stopwatch-pauseButton"
+              className="Stopwatch-button Stopwatch-background-blue"
               type="button"
               onClick={() => {
                 setIsResumed(false);
@@ -300,11 +318,11 @@ export default function (props: any) {
                 setRecords({ type: 'add', hours, minutes, seconds });
               }}
             >
-              휴식하기
+              쉬기
             </button>
           ) : (
             <button
-              className="Stopwatch-startButton"
+              className="Stopwatch-button Stopwatch-background-blue"
               type="button"
               onClick={() => {
                 setIsStarted(true);
@@ -326,8 +344,11 @@ export default function (props: any) {
       <section className="Stopwatch-studyRecords-section">
         <h3 className="srOnly">공부기록</h3>
 
-        <div className="Stopwatch-saveButton-div">
+        <div className="textAlign-right">
+          {/* 저장하기 버튼은 저장하기 modal을 여는 역할을 함 */}
+          {/* 실제로 저장하는 것이 아님 */}
           <button
+            className="Stopwatch-button"
             onClick={() => {
               // 한 번이라도 스톱워치가 공부시간을 측정하지 않은 경우
               if (records.length === 0 && !isStarted) {
@@ -362,9 +383,9 @@ export default function (props: any) {
         <table>
           <thead>
             <tr>
-              <th>교시</th>
-              <th>공부시간</th>
-              <th>휴식시간</th>
+              <th scope="col">교시</th>
+              <th scope="col">공부시간</th>
+              <th scope="col">휴식시간</th>
             </tr>
           </thead>
 
@@ -410,7 +431,19 @@ export default function (props: any) {
         <form
           className="Stopwatch-saveRecordsForm"
           onSubmit={(e) => {
+            let key: string;
             e.preventDefault();
+            if (localStorageKey === null) {
+              key = heading + Math.floor(Date.now() / 1000);
+              localStorage.setItem(key, JSON.stringify(records));
+              setLocalStorageKey(key);
+            } else {
+              key = heading + Math.floor(Date.now() / 1000);
+              localStorage.removeItem(localStorageKey);
+              localStorage.setItem(key, JSON.stringify(records));
+              setLocalStorageKey(key);
+            }
+            console.log(key);
           }}
         >
           <h3>공부기록 저장</h3>

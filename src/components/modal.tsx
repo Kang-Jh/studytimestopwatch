@@ -1,10 +1,11 @@
 import { useRef, useEffect, ReactElement } from 'react';
-import * as ReactDOM from 'react-dom';
+import ReactDOM from 'react-dom';
 import '../styles/modal.css';
 
 const modalRoot: HTMLElement = document.getElementById(
   'modalRoot'
 ) as HTMLElement;
+
 export default function ({
   isOpen,
   children,
@@ -15,7 +16,7 @@ export default function ({
   const containerRef = useRef(document.createElement('div'));
 
   useEffect(() => {
-    const container = containerRef.current;
+    const container: HTMLDivElement = containerRef.current;
     container.setAttribute('class', 'Modal');
     modalRoot.appendChild(container);
 
