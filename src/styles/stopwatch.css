@@ -5,15 +5,11 @@
 
 .Stopwatch-sectionHeader {
   font-size: 40px;
-  margin-bottom: 0;
+  margin: 0;
 }
 
 .Stopwatch-stopwatchDisplay {
   font-size: 150px;
-}
-
-.Stopwatch-saveButton-div {
-  text-align: right;
 }
 
 .Stopwatch-studyRecords-section {
@@ -35,4 +31,21 @@
 
 .Stopwatch-saveRecordsForm-inputDiv {
   padding: 150px 0;
+}
+
+.Stopwatch-button {
+  display: inline-block;
+  border: none;
+  width: 100px;
+  height: 50px;
+}
+
+.Stopwatch-background-blue {
+  color: #fefefe;
+  background-color: #008fff;
+}
+
+.Stopwatch-background-white {
+  color: #070707;
+  background-color: #fefefe;
 }
