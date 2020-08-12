@@ -2,10 +2,28 @@ import React, { useState, useLayoutEffect, useRef, useReducer } from 'react';
 import Modal from './modal';
 import '../styles/stopwatch.css';
 
-interface GetTimeReturn {
+interface Time {
   hours: number;
   minutes: number;
   seconds: number;
+}
+
+interface Record {
+  heading: string;
+  date: Date;
+  periodRecords: PeriodRecord[];
+  totalStudyTime?: Time;
+  totalRestTime?: Time;
+}
+
+interface PeriodRecord {
+  period?: number;
+  netStudyTimeHours?: number;
+  netStudyTimeMinutes?: number;
+  netStudyTimeSeconds?: number;
+  restTimeHours?: number;
+  restTimeMinutes?: number;
+  restTimeSeconds?: number;
 }
 
 // performance가 존재하지 않으면 Date로 대체
@@ -18,9 +36,7 @@ const miliSecondsToSeconds: (miliseconds: number) => number = (
 
 // getTime는 초로 표현된 시간값을 입력값으로 받아
 // 몇 시간, 몇 분, 몇 초인지를 구할 수 있게 해줌
-const getTime: (timeAsSec: number) => GetTimeReturn = (
-  timeAsSec: number
-): GetTimeReturn => {
+const getTime: (timeAsSec: number) => Time = (timeAsSec: number): Time => {
   const hours: number = Math.floor(timeAsSec / 3600);
   const minutes: number = Math.floor((timeAsSec - hours * 3600) / 60);
   const seconds: number = timeAsSec - hours * 3600 - minutes * 60;
@@ -42,111 +58,151 @@ const getDisplayTime: (number: number) => string | number = (number) => {
 
 // recordsReducer는 일시정지 버튼이 클릭될 때마다 클릭된 시간을 기록
 // 또는 리셋 버튼이 클릭될 경우 모든 기록을 삭제
-const recordsReducer = (state: any[], action: any): any[] => {
+const recordsReducer = (state: Record, action: any): Record => {
   const {
     type,
     hours,
     minutes,
     seconds,
     pauseTime,
+    heading,
   }: {
     type: string;
     hours: number;
     minutes: number;
     seconds: number;
-    pauseTime: number;
+    pauseTime: number | null;
+    heading: string;
   } = action;
-  let newState: Array<any>;
-  let lastElement: any;
+  let newState: Record = { ...state };
+  let lastPeriodRecord: PeriodRecord;
 
   switch (type) {
     case 'reset':
-      return [];
+      return {
+        date: state.date,
+        periodRecords: [],
+        heading: '',
+      };
     case 'add':
-      newState = state.map((el) => el);
-      if (newState.length === 0) {
+      if (state.periodRecords.length === 0) {
+        const periodRecords = [];
         // net이 붙은 prop들은 순공부시간을 의미
         // net이 붙지 않은 prop들은 일시정지가 눌렸을 때의 시간을 의미
         // net이 붙은 값들은 모두 이전 일시정지부터 얼마만큼 공부했는지를 나타냄
-        // checkpoint는 기록순서를 나타냄
-        newState.push({
-          checkpoint: 1,
-          hours,
-          minutes,
-          seconds,
-          net_hours: hours,
-          net_minutes: minutes,
-          net_seconds: seconds,
+        // period는 교시를 나타냄
+        periodRecords.push({
+          period: 1,
+          netStudyTimeHours: hours,
+          netStudyTimeMinutes: minutes,
+          netStudyTimeSeconds: seconds,
         });
+
+        newState.periodRecords = periodRecords;
       } else {
-        newState = state.map((el) => el);
-        lastElement = newState[newState.length - 1];
         // 현재 타이머에 표시된 시간과 기록되는 시간이
         // 같지 않으면 isChanged는 true, 같으면 false
         const isChanged: boolean =
-          lastElement.hours !== hours ||
-          lastElement.minutes !== minutes ||
-          lastElement.seconds !== seconds;
+          (newState.totalStudyTime as Time).hours !== hours ||
+          (newState.totalStudyTime as Time).minutes !== minutes ||
+          (newState.totalStudyTime as Time).seconds !== seconds;
 
         // 변하지 않았으면 state를 return
         if (!isChanged) {
           return state;
         }
 
-        const net_studytime: number =
+        const netStudytime: number =
           hours * 3600 +
           minutes * 60 +
           seconds -
-          (lastElement.hours * 3600 +
-            lastElement.minutes * 60 +
-            lastElement.seconds);
+          ((newState.totalStudyTime as Time).hours * 3600 +
+            (newState.totalStudyTime as Time).minutes * 60 +
+            (newState.totalStudyTime as Time).seconds);
 
         const {
-          hours: net_hours,
-          minutes: net_minutes,
-          seconds: net_seconds,
-        }: GetTimeReturn = getTime(net_studytime);
-        newState.push({
-          checkpoint: lastElement.checkpoint + 1,
-          hours,
-          minutes,
-          seconds,
-          net_hours,
-          net_minutes,
-          net_seconds,
+          hours: netStudyTimeHours,
+          minutes: netStudyTimeMinutes,
+          seconds: netStudyTimeSeconds,
+        }: Time = getTime(netStudytime);
+
+        lastPeriodRecord =
+          newState.periodRecords[newState.periodRecords.length - 1];
+        const lastPeriod = lastPeriodRecord.period as number;
+
+        const periodRecords = [...newState.periodRecords];
+        periodRecords.push({
+          period: lastPeriod + 1,
+          netStudyTimeHours,
+          netStudyTimeMinutes,
+          netStudyTimeSeconds,
         });
+        newState.periodRecords = periodRecords;
       }
+
+      newState.totalStudyTime = {
+        hours,
+        minutes,
+        seconds,
+      };
 
       return newState;
     case 'restTime':
       if (pauseTime === null) {
+        // 처음 공부하기 버튼이 클릭될 때
         return state;
+      } else {
+        let restTime: number = miliSecondsToSeconds(getNow()) - pauseTime;
+        const {
+          hours: restTimeHours,
+          minutes: restTimeMinutes,
+          seconds: restTimeSeconds,
+        }: Time = getTime(restTime);
+
+        // 마지막 교시 기록에 휴식시간이 존재하지 않으면
+        // 휴식시간을 기록에 추가
+        // 이미 존재하면 휴식시간을 수정하지 않음
+        lastPeriodRecord =
+          newState.periodRecords[newState.periodRecords.length - 1];
+        if (lastPeriodRecord && lastPeriodRecord.restTimeHours === undefined) {
+          lastPeriodRecord = {
+            ...lastPeriodRecord,
+            restTimeHours,
+            restTimeMinutes,
+            restTimeSeconds,
+          };
+        }
+
+        newState.periodRecords[
+          newState.periodRecords.length - 1
+        ] = lastPeriodRecord;
+
+        // 총 휴식시간이 존재하는 경우 이전 총 휴식시간에 이번 교시 휴식시간을 더함
+        // 존재하지 않을 경우 이번 교시 휴식시간을 총 휴식시간으로 설정
+        if (newState.totalRestTime) {
+          newState.totalRestTime = {
+            hours:
+              newState.totalRestTime.hours +
+              (lastPeriodRecord.restTimeHours as number),
+            minutes:
+              newState.totalRestTime.minutes +
+              (lastPeriodRecord.restTimeMinutes as number),
+            seconds:
+              newState.totalRestTime.seconds +
+              (lastPeriodRecord.restTimeSeconds as number),
+          };
+        } else if (!newState.totalRestTime) {
+          newState.totalRestTime = {
+            hours: restTimeHours,
+            minutes: restTimeMinutes,
+            seconds: restTimeSeconds,
+          };
+        }
+
+        return newState;
       }
-
-      newState = state.map((el) => el);
-
-      let restTime: number = miliSecondsToSeconds(getNow()) - pauseTime;
-      const {
-        hours: restTime_hours,
-        minutes: restTime_minutes,
-        seconds: restTime_seconds,
-      }: GetTimeReturn = getTime(restTime);
-
-      // 마지막 기록에 휴식시간이 존재하지 않으면
-      // 휴식시간을 기록에 추가
-      // 이미 존재하면 휴식시간을 수정하지 않음
-      lastElement = newState[newState.length - 1];
-      if (lastElement && lastElement.restTime_hours === undefined) {
-        lastElement = {
-          ...lastElement,
-          restTime_hours,
-          restTime_minutes,
-          restTime_seconds,
-        };
-      }
-
-      newState[newState.length - 1] = lastElement;
-
+    case 'heading':
+      newState = { ...newState, heading };
       return newState;
     default:
       return state;
@@ -170,9 +226,13 @@ export default function (props: any) {
   const [isResumed, setIsResumed] = useState(false);
   const [isReset, setIsReset] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
-  const [heading, setHeading] = useState('');
-  const [records, setRecords] = useReducer(recordsReducer, []);
+  const [records, setRecords] = useReducer(recordsReducer, {
+    heading: '',
+    date: new Date(),
+    periodRecords: [],
+  });
   const [localStorageKey, setLocalStorageKey] = useState<string | null>(null);
+
   // useEffect 사용시 일시정지, 시작버튼을 빠르게 연속클릭할 시
   // 정지되어야 할 상황에서도 타이머가 계속 실행됨
   // 공부시간을 측정하기 위한 이펙트
@@ -203,7 +263,7 @@ export default function (props: any) {
         runningTime = getNow() - elapsed;
         const nowAsSec: number = miliSecondsToSeconds(runningTime);
         // 초로 표현된 시간값을 시, 분, 초값으로 변환
-        const { hours, minutes, seconds }: GetTimeReturn = getTime(nowAsSec);
+        const { hours, minutes, seconds }: Time = getTime(nowAsSec);
 
         // 위에서 구한 시, 분, 초값을 state에 저장
         setHours(hours);
@@ -239,7 +299,7 @@ export default function (props: any) {
           hours: restHours,
           minutes: restMinutes,
           seconds: restSeconds,
-        }: GetTimeReturn = getTime(restTimeAsSec);
+        }: Time = getTime(restTimeAsSec);
 
         setRestHours(restHours);
         setRestMinutes(restMinutes);
@@ -300,6 +360,7 @@ export default function (props: any) {
                 setIsStarted(false);
                 setIsResumed(false);
                 setIsReset(true);
+                setPauseTime(null);
                 setRecords({ type: 'reset' });
               }}
             >
@@ -351,7 +412,7 @@ export default function (props: any) {
             className="Stopwatch-button"
             onClick={() => {
               // 한 번이라도 스톱워치가 공부시간을 측정하지 않은 경우
-              if (records.length === 0 && !isStarted) {
+              if (records.periodRecords.length === 0 && !isStarted) {
                 alert('공부 기록이 존재하지 않습니다');
                 return;
               }
@@ -380,7 +441,7 @@ export default function (props: any) {
           </button>
         </div>
 
-        <table>
+        <table className="Stopwatch-table">
           <thead>
             <tr>
               <th scope="col">교시</th>
@@ -390,33 +451,34 @@ export default function (props: any) {
           </thead>
 
           <tbody>
-            {records.map(
+            {records.periodRecords.map(
               ({
-                net_hours,
-                net_minutes,
-                net_seconds,
-                checkpoint,
-                restTime_hours,
-                restTime_minutes,
-                restTime_seconds,
+                period,
+                netStudyTimeHours,
+                netStudyTimeMinutes,
+                netStudyTimeSeconds,
+                restTimeHours,
+                restTimeMinutes,
+                restTimeSeconds,
               }) => (
-                <tr key={checkpoint}>
-                  <td>{checkpoint}</td>
+                <tr key={period}>
+                  <td>{period}</td>
 
                   <td>
                     <span>
-                      {getDisplayTime(net_hours)}:{getDisplayTime(net_minutes)}:
-                      {getDisplayTime(net_seconds)}
+                      {getDisplayTime(netStudyTimeHours as number)}:
+                      {getDisplayTime(netStudyTimeMinutes as number)}:
+                      {getDisplayTime(netStudyTimeSeconds as number)}
                     </span>
                   </td>
 
                   {/* restTime_hours가 undefined가 아니면 나머지 restTime들도 undefined가 아니므로 restTime_hours만 사용 */}
-                  {restTime_hours !== undefined && (
+                  {restTimeHours !== undefined && (
                     <td>
                       <span>
-                        {getDisplayTime(restTime_hours)}:
-                        {getDisplayTime(restTime_minutes)}:
-                        {getDisplayTime(restTime_seconds)}
+                        {getDisplayTime(restTimeHours as number)}:
+                        {getDisplayTime(restTimeMinutes as number)}:
+                        {getDisplayTime(restTimeSeconds as number)}
                       </span>
                     </td>
                   )}
@@ -424,6 +486,26 @@ export default function (props: any) {
               )
             )}
           </tbody>
+
+          <tfoot>
+            <tr>
+              <th scope="row">총합</th>
+              {records.totalStudyTime && (
+                <td>
+                  {getDisplayTime(records.totalStudyTime.hours)}:
+                  {getDisplayTime(records.totalStudyTime.minutes)}:
+                  {getDisplayTime(records.totalStudyTime.seconds)}
+                </td>
+              )}
+              {records.totalRestTime && (
+                <td>
+                  {getDisplayTime(records.totalRestTime.hours)}:
+                  {getDisplayTime(records.totalRestTime.minutes)}:
+                  {getDisplayTime(records.totalRestTime.seconds)}
+                </td>
+              )}
+            </tr>
+          </tfoot>
         </table>
       </section>
 
@@ -434,11 +516,11 @@ export default function (props: any) {
             let key: string;
             e.preventDefault();
             if (localStorageKey === null) {
-              key = heading + Math.floor(Date.now() / 1000);
+              key = records.heading + Math.floor(Date.now() / 1000);
               localStorage.setItem(key, JSON.stringify(records));
               setLocalStorageKey(key);
             } else {
-              key = heading + Math.floor(Date.now() / 1000);
+              key = records.heading + Math.floor(Date.now() / 1000);
               localStorage.removeItem(localStorageKey);
               localStorage.setItem(key, JSON.stringify(records));
               setLocalStorageKey(key);
@@ -453,8 +535,10 @@ export default function (props: any) {
             <input
               type="text"
               id="heading"
-              value={heading}
-              onChange={(e) => setHeading(e.target.value)}
+              value={records.heading}
+              onChange={(e) =>
+                setRecords({ type: 'heading', heading: e.target.value })
+              }
             />
           </div>
 
@@ -463,7 +547,7 @@ export default function (props: any) {
             <button
               type="button"
               onClick={() => {
-                setHeading('');
+                setRecords({ type: 'heading', heading: '' });
                 setIsOpen(false);
               }}
             >
