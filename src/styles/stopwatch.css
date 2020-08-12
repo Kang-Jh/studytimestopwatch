@@ -49,3 +49,20 @@
   color: #070707;
   background-color: #fefefe;
 }
+
+.Stopwatch-table {
+  table-layout: fixed;
+  width: 100%;
+}
+
+.Stopwatch-table thead th:nth-child(1) {
+  width: 10%;
+}
+
+.Stopwatch-table thead th:nth-child(2) {
+  width: 45%;
+}
+
+.Stopwatch-table thead th:nth-child(3) {
+  width: 45%;
+}
