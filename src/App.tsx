@@ -1,11 +1,23 @@
 import React from 'react';
+import { Route, Switch } from 'react-router-dom';
+import Header from './components/header';
 import Stopwatch from './components/stopwatch';
+import MyRecords from './components/myRecords';
 import './App.css';
 
 function App() {
   return (
     <div className="App" aria-live="assertive">
-      <Stopwatch />
+      <Header />
+      <Switch>
+        <Route path="/myRecords">
+          <MyRecords />
+        </Route>
+
+        <Route path="/">
+          <Stopwatch />
+        </Route>
+      </Switch>
     </div>
   );
 }

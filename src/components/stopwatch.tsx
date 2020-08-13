@@ -1,64 +1,18 @@
 import React, { useState, useLayoutEffect, useRef, useReducer } from 'react';
 import Modal from './modal';
+import Time from '../@types/time';
+import { Record, PeriodRecord } from '../@types/record';
+import {
+  getNow,
+  getDisplayTime,
+  getTime,
+  miliSecondsToSeconds,
+} from '../functions/time';
 import '../styles/stopwatch.css';
-
-interface Time {
-  hours: number;
-  minutes: number;
-  seconds: number;
-}
-
-interface Record {
-  heading: string;
-  date: Date;
-  periodRecords: PeriodRecord[];
-  totalStudyTime?: Time;
-  totalRestTime?: Time;
-}
-
-interface PeriodRecord {
-  period?: number;
-  netStudyTimeHours?: number;
-  netStudyTimeMinutes?: number;
-  netStudyTimeSeconds?: number;
-  restTimeHours?: number;
-  restTimeMinutes?: number;
-  restTimeSeconds?: number;
-}
-
-// performance가 존재하지 않으면 Date로 대체
-const timeObject: any = typeof performance === 'object' ? performance : Date;
-// getNow 함수를 이용하는 이유는 performance.now()를 사용할 수 없을 경우 Date.now()를 사용하기 위함
-const getNow: () => number = () => timeObject.now();
-const miliSecondsToSeconds: (miliseconds: number) => number = (
-  miliseconds: number
-): number => Math.floor(miliseconds / 1000);
-
-// getTime는 초로 표현된 시간값을 입력값으로 받아
-// 몇 시간, 몇 분, 몇 초인지를 구할 수 있게 해줌
-const getTime: (timeAsSec: number) => Time = (timeAsSec: number): Time => {
-  const hours: number = Math.floor(timeAsSec / 3600);
-  const minutes: number = Math.floor((timeAsSec - hours * 3600) / 60);
-  const seconds: number = timeAsSec - hours * 3600 - minutes * 60;
-
-  return {
-    hours,
-    minutes,
-    seconds,
-  };
-};
-
-// 입력값이 10보다 작으면 앞에 0을 붙인 문자열을 return
-// 입력값이 10 이상이면 입력값을 그대로 return
-// 이로써 화면에 표시되는 시(또는 분 또는 초)가
-// 10보다 작을 경우 앞에 0을 붙인 값이 화면에 표시됨
-const getDisplayTime: (number: number) => string | number = (number) => {
-  return number < 10 ? `0${number}` : number;
-};
 
 // recordsReducer는 일시정지 버튼이 클릭될 때마다 클릭된 시간을 기록
 // 또는 리셋 버튼이 클릭될 경우 모든 기록을 삭제
-const recordsReducer = (state: Record, action: any): Record => {
+const recordReducer = (state: Record, action: any): Record => {
   const {
     type,
     hours,
@@ -226,7 +180,7 @@ export default function (props: any) {
   const [isResumed, setIsResumed] = useState(false);
   const [isReset, setIsReset] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
-  const [records, setRecords] = useReducer(recordsReducer, {
+  const [record, setRecord] = useReducer(recordReducer, {
     heading: '',
     date: new Date(),
     periodRecords: [],
@@ -315,7 +269,7 @@ export default function (props: any) {
   }, [isStarted, isResumed]);
 
   return (
-    <main className="Stopwatch-main">
+    <main className="Stopwatch">
       <h2 className="srOnly">스톱워치</h2>
 
       <section>
@@ -361,7 +315,7 @@ export default function (props: any) {
                 setIsResumed(false);
                 setIsReset(true);
                 setPauseTime(null);
-                setRecords({ type: 'reset' });
+                setRecord({ type: 'reset' });
               }}
             >
               리셋
@@ -376,7 +330,7 @@ export default function (props: any) {
                 setIsResumed(false);
                 setIsReset(false);
                 setPauseTime(miliSecondsToSeconds(getNow()));
-                setRecords({ type: 'add', hours, minutes, seconds });
+                setRecord({ type: 'add', hours, minutes, seconds });
               }}
             >
               쉬기
@@ -390,7 +344,7 @@ export default function (props: any) {
                 setIsResumed(true);
                 setIsReset(false);
                 // 휴식시간은 공부하기 버튼이 클릭될 때 측정됨
-                setRecords({
+                setRecord({
                   type: 'restTime',
                   pauseTime,
                 });
@@ -412,7 +366,7 @@ export default function (props: any) {
             className="Stopwatch-button"
             onClick={() => {
               // 한 번이라도 스톱워치가 공부시간을 측정하지 않은 경우
-              if (records.periodRecords.length === 0 && !isStarted) {
+              if (record.periodRecords.length === 0 && !isStarted) {
                 alert('공부 기록이 존재하지 않습니다');
                 return;
               }
@@ -421,7 +375,7 @@ export default function (props: any) {
                 // 현재 공부시간을 측정 중인 경우
                 // 공부시간을 기록하고
                 // 일시정지 시간에 현재 시간을 저장
-                setRecords({ type: 'add', hours, minutes, seconds });
+                setRecord({ type: 'add', hours, minutes, seconds });
                 setPauseTime(miliSecondsToSeconds(getNow()));
               } else {
                 // 현재 휴식시간을 측정 중인 경우
@@ -429,7 +383,7 @@ export default function (props: any) {
                 // 일시정지 시간을 null로 저장
                 // 일시정지 시간을 null로 저장함으로써
                 // 공부하기 버튼이 다시 클릭됐을 때 마지막 휴식시간을 변경하지 않음
-                setRecords({ type: 'restTime', pauseTime });
+                setRecord({ type: 'restTime', pauseTime });
                 setPauseTime(null);
               }
               setIsStarted(false);
@@ -451,7 +405,7 @@ export default function (props: any) {
           </thead>
 
           <tbody>
-            {records.periodRecords.map(
+            {record.periodRecords.map(
               ({
                 period,
                 netStudyTimeHours,
@@ -476,7 +430,7 @@ export default function (props: any) {
                   {restTimeHours !== undefined && (
                     <td>
                       <span>
-                        {getDisplayTime(restTimeHours as number)}:
+                        {getDisplayTime(restTimeHours)}:
                         {getDisplayTime(restTimeMinutes as number)}:
                         {getDisplayTime(restTimeSeconds as number)}
                       </span>
@@ -490,18 +444,18 @@ export default function (props: any) {
           <tfoot>
             <tr>
               <th scope="row">총합</th>
-              {records.totalStudyTime && (
+              {record.totalStudyTime && (
                 <td>
-                  {getDisplayTime(records.totalStudyTime.hours)}:
-                  {getDisplayTime(records.totalStudyTime.minutes)}:
-                  {getDisplayTime(records.totalStudyTime.seconds)}
+                  {getDisplayTime(record.totalStudyTime.hours)}:
+                  {getDisplayTime(record.totalStudyTime.minutes)}:
+                  {getDisplayTime(record.totalStudyTime.seconds)}
                 </td>
               )}
-              {records.totalRestTime && (
+              {record.totalRestTime && (
                 <td>
-                  {getDisplayTime(records.totalRestTime.hours)}:
-                  {getDisplayTime(records.totalRestTime.minutes)}:
-                  {getDisplayTime(records.totalRestTime.seconds)}
+                  {getDisplayTime(record.totalRestTime.hours)}:
+                  {getDisplayTime(record.totalRestTime.minutes)}:
+                  {getDisplayTime(record.totalRestTime.seconds)}
                 </td>
               )}
             </tr>
@@ -513,19 +467,18 @@ export default function (props: any) {
         <form
           className="Stopwatch-saveRecordsForm"
           onSubmit={(e) => {
-            let key: string;
             e.preventDefault();
+            let key: string;
             if (localStorageKey === null) {
-              key = records.heading + Math.floor(Date.now() / 1000);
-              localStorage.setItem(key, JSON.stringify(records));
+              key = `${record.date} ${record.heading}`;
+              localStorage.setItem(key, JSON.stringify(record));
               setLocalStorageKey(key);
             } else {
-              key = records.heading + Math.floor(Date.now() / 1000);
+              key = `${record.date} ${record.heading}`;
               localStorage.removeItem(localStorageKey);
-              localStorage.setItem(key, JSON.stringify(records));
+              localStorage.setItem(key, JSON.stringify(record));
               setLocalStorageKey(key);
             }
-            console.log(key);
           }}
         >
           <h3>공부기록 저장</h3>
@@ -535,9 +488,9 @@ export default function (props: any) {
             <input
               type="text"
               id="heading"
-              value={records.heading}
+              value={record.heading}
               onChange={(e) =>
-                setRecords({ type: 'heading', heading: e.target.value })
+                setRecord({ type: 'heading', heading: e.target.value })
               }
             />
           </div>
@@ -547,7 +500,7 @@ export default function (props: any) {
             <button
               type="button"
               onClick={() => {
-                setRecords({ type: 'heading', heading: '' });
+                setRecord({ type: 'heading', heading: '' });
                 setIsOpen(false);
               }}
             >
