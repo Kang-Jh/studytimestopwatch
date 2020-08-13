@@ -1,23 +1,21 @@
-.Stopwatch-main {
-  padding: 50px;
-  margin: 50px;
-}
-
 .Stopwatch-sectionHeader {
   font-size: 40px;
   margin: 0;
 }
 
+/* display that is displaying time */
 .Stopwatch-stopwatchDisplay {
   font-size: 150px;
 }
 
+/* record section */
 .Stopwatch-studyRecords-section {
   width: 50%;
   margin: auto;
   margin-top: 100px;
 }
 
+/* form and its elements */
 .Stopwatch-saveRecordsForm {
   text-align: center;
 }
@@ -33,6 +31,7 @@
   padding: 150px 0;
 }
 
+/* button */
 .Stopwatch-button {
   display: inline-block;
   border: none;
@@ -40,6 +39,7 @@
   height: 50px;
 }
 
+/* background color */
 .Stopwatch-background-blue {
   color: #fefefe;
   background-color: #008fff;
@@ -50,19 +50,19 @@
   background-color: #fefefe;
 }
 
+/* table */
 .Stopwatch-table {
   table-layout: fixed;
   width: 100%;
 }
 
+/* setting head cell width of thead of table */
+/* which is different from othe */
 .Stopwatch-table thead th:nth-child(1) {
   width: 10%;
 }
 
-.Stopwatch-table thead th:nth-child(2) {
-  width: 45%;
-}
-
+.Stopwatch-table thead th:nth-child(2),
 .Stopwatch-table thead th:nth-child(3) {
   width: 45%;
 }
