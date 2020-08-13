@@ -1,6 +1,6 @@
 import React, { useState, useLayoutEffect, useRef, useReducer } from 'react';
 import Modal from './modal';
-import Time from '../@types/time';
+import { Time } from '../@types/time';
 import { Record, PeriodRecord } from '../@types/record';
 import {
   getNow,
@@ -163,12 +163,9 @@ const recordReducer = (state: Record, action: any): Record => {
   }
 };
 
-// TODO 휴식시간을 따로 표시해주는 타이머 구현하기
 export default function (props: any) {
-  // 컴포넌트가 마운트 되었을 때의 시간으로
-  // 공부시간 측정의 기준값
   const mountTimeRef = useRef(getNow());
-  const runningTimeRef = useRef(mountTimeRef.current); // 타이머 실행시간을 위한 ref로 초기값은 마운트된 시간
+  const runningTimeRef = useRef(0);
   const [hours, setHours] = useState(0);
   const [minutes, setMinutes] = useState(0);
   const [seconds, setSeconds] = useState(0);
@@ -193,19 +190,22 @@ export default function (props: any) {
   useLayoutEffect(() => {
     // 리셋버튼이 눌릴 시 타이머 실행시간을 초기화하기 위함
     if (!isStarted && isReset) {
-      runningTimeRef.current = mountTimeRef.current;
+      runningTimeRef.current = 0;
     }
 
     // 공부하기 버튼이 클릭되면 실행
     if (isStarted && isResumed) {
       let rAF: number;
 
-      // 시작 버튼이 클릭된 시간에서 타이머가 실행된 시간을 뺌
-      // 처음 클릭 시에는 컴포넌트가 마운트된 시간이 빠짐 왜냐하면 실행시간의 초기값이 마운트시간이기 때문
+      // 실행시간은 버튼이 클릭된 시간에서 마운트된 시간과 휴식 시간을 뺀 것
+      let runningTime: number;
+
       const buttonClickedTime: number = getNow();
       const prevRunningTime: number = runningTimeRef.current;
-      const elapsed: number = buttonClickedTime - prevRunningTime;
-      let runningTime: number;
+      const mountTime: number = mountTimeRef.current;
+
+      // idleTime(휴식시간)은 버튼이 클릭된 시간에서 이전 실행시간과 마운트 시간을 뺸 것
+      const idleTime: number = buttonClickedTime - prevRunningTime - mountTime;
 
       rAF = requestAnimationFrame(timer);
 
@@ -214,7 +214,7 @@ export default function (props: any) {
         // timer 함수가 실행될 때마다
         // 현재시간에서 elapsed를 빼줌으로써
         // 타이머가 실행된 시간만 계산하게 됨
-        runningTime = getNow() - elapsed;
+        runningTime = getNow() - idleTime - mountTime;
         const nowAsSec: number = miliSecondsToSeconds(runningTime);
         // 초로 표현된 시간값을 시, 분, 초값으로 변환
         const { hours, minutes, seconds }: Time = getTime(nowAsSec);

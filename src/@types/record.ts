@@ -1,4 +1,4 @@
-import Time from './time';
+import { Time } from './time';
 
 export interface Record {
   heading: string;
