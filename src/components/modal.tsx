@@ -7,10 +7,10 @@ const modalRoot: HTMLElement = document.getElementById(
 ) as HTMLElement;
 
 export default function ({
-  isOpen,
+  isOpened,
   children,
 }: {
-  isOpen: boolean;
+  isOpened: boolean;
   children: ReactElement;
 }) {
   const containerRef = useRef(document.createElement('div'));
@@ -26,16 +26,16 @@ export default function ({
   }, []);
 
   useEffect(() => {
-    if (isOpen) {
+    if (isOpened) {
       modalRoot.setAttribute('class', 'open');
     }
 
     return () => {
       modalRoot.setAttribute('class', '');
     };
-  }, [isOpen]);
+  }, [isOpened]);
 
-  if (isOpen) {
+  if (isOpened) {
     return ReactDOM.createPortal(children, containerRef.current);
   } else {
     return null;
