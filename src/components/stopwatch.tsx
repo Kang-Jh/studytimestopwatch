@@ -10,7 +10,7 @@ import {
 } from '../functions/time';
 import '../styles/stopwatch.css';
 
-interface ActionParameter {
+interface StopwatchActionParameter {
   type: string;
   hours?: number;
   minutes?: number;
@@ -33,7 +33,7 @@ const recordReducer = (
     restHours = 0,
     restMinutes = 0,
     restSeconds = 0,
-  }: ActionParameter
+  }: StopwatchActionParameter
 ): Record => {
   let newState: Record = { ...state };
   let lastPeriodRecord: PeriodRecord;
