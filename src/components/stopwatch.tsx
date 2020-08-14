@@ -10,24 +10,31 @@ import {
 } from '../functions/time';
 import '../styles/stopwatch.css';
 
+interface ActionParameter {
+  type: string;
+  hours?: number;
+  minutes?: number;
+  seconds?: number;
+  heading?: string;
+  restHours?: number;
+  restMinutes?: number;
+  restSeconds?: number;
+}
 // recordsReducer는 일시정지 버튼이 클릭될 때마다 클릭된 시간을 기록
 // 또는 리셋 버튼이 클릭될 경우 모든 기록을 삭제
-const recordReducer = (state: Record, action: any): Record => {
-  const {
+const recordReducer = (
+  state: Record,
+  {
     type,
-    hours,
-    minutes,
-    seconds,
-    pauseTime,
-    heading,
-  }: {
-    type: string;
-    hours: number;
-    minutes: number;
-    seconds: number;
-    pauseTime: number | null;
-    heading: string;
-  } = action;
+    hours = 0,
+    minutes = 0,
+    seconds = 0,
+    heading = '',
+    restHours = 0,
+    restMinutes = 0,
+    restSeconds = 0,
+  }: ActionParameter
+): Record => {
   let newState: Record = { ...state };
   let lastPeriodRecord: PeriodRecord;
 
@@ -38,7 +45,7 @@ const recordReducer = (state: Record, action: any): Record => {
         periodRecords: [],
         heading: '',
       };
-    case 'add':
+    case 'studyTime':
       if (state.periodRecords.length === 0) {
         const periodRecords = [];
         // net이 붙은 prop들은 순공부시간을 의미
@@ -102,59 +109,61 @@ const recordReducer = (state: Record, action: any): Record => {
 
       return newState;
     case 'restTime':
-      if (pauseTime === null) {
-        // 처음 공부하기 버튼이 클릭될 때
-        return state;
-      } else {
-        let restTime: number = miliSecondsToSeconds(getNow()) - pauseTime;
-        const {
-          hours: restTimeHours,
-          minutes: restTimeMinutes,
-          seconds: restTimeSeconds,
-        }: Time = getTime(restTime);
+      const periodRecords = [...newState.periodRecords];
 
-        // 마지막 교시 기록에 휴식시간이 존재하지 않으면
-        // 휴식시간을 기록에 추가
-        // 이미 존재하면 휴식시간을 수정하지 않음
-        lastPeriodRecord =
-          newState.periodRecords[newState.periodRecords.length - 1];
-        if (lastPeriodRecord && lastPeriodRecord.restTimeHours === undefined) {
-          lastPeriodRecord = {
-            ...lastPeriodRecord,
-            restTimeHours,
-            restTimeMinutes,
-            restTimeSeconds,
-          };
-        }
-
-        newState.periodRecords[
-          newState.periodRecords.length - 1
-        ] = lastPeriodRecord;
+      // 마지막 교시 기록에 휴식시간이 존재하지 않으면
+      // 휴식시간을 기록에 추가
+      // 이미 존재하면 휴식시간을 수정하지 않음
+      lastPeriodRecord = periodRecords[periodRecords.length - 1];
+      if (lastPeriodRecord && lastPeriodRecord.restTimeHours === undefined) {
+        lastPeriodRecord = {
+          ...lastPeriodRecord,
+          restTimeHours: restHours,
+          restTimeMinutes: restMinutes,
+          restTimeSeconds: restSeconds,
+        };
 
         // 총 휴식시간이 존재하는 경우 이전 총 휴식시간에 이번 교시 휴식시간을 더함
         // 존재하지 않을 경우 이번 교시 휴식시간을 총 휴식시간으로 설정
         if (newState.totalRestTime) {
+          const lastTotalRestTime: Time = newState.totalRestTime;
+          const {
+            hours: lastHours,
+            minutes: lastMinutes,
+            seconds: lastSeconds,
+          } = lastTotalRestTime;
+          let hours = lastHours + restHours;
+          let minutes = lastMinutes + restMinutes;
+          let seconds = lastSeconds + restSeconds;
+
+          if (seconds >= 60) {
+            seconds -= 60;
+            minutes += 1;
+          }
+
+          if (minutes >= 60) {
+            minutes -= 60;
+            hours += 1;
+          }
+
           newState.totalRestTime = {
-            hours:
-              newState.totalRestTime.hours +
-              (lastPeriodRecord.restTimeHours as number),
-            minutes:
-              newState.totalRestTime.minutes +
-              (lastPeriodRecord.restTimeMinutes as number),
-            seconds:
-              newState.totalRestTime.seconds +
-              (lastPeriodRecord.restTimeSeconds as number),
+            hours,
+            minutes,
+            seconds,
           };
-        } else if (!newState.totalRestTime) {
+        } else {
           newState.totalRestTime = {
-            hours: restTimeHours,
-            minutes: restTimeMinutes,
-            seconds: restTimeSeconds,
+            hours: restHours,
+            minutes: restMinutes,
+            seconds: restSeconds,
           };
         }
-
-        return newState;
       }
+
+      periodRecords[periodRecords.length - 1] = lastPeriodRecord;
+      newState.periodRecords = periodRecords;
+
+      return newState;
     case 'heading':
       newState = { ...newState, heading };
       return newState;
@@ -172,7 +181,6 @@ export default function (props: any) {
   const [restHours, setRestHours] = useState(0);
   const [restMinutes, setRestMinutes] = useState(0);
   const [restSeconds, setRestSeconds] = useState(0);
-  const [pauseTime, setPauseTime] = useState<number | null>(null);
   const [isStarted, setIsStarted] = useState(false);
   const [isResumed, setIsResumed] = useState(false);
   const [isReset, setIsReset] = useState(false);
@@ -314,7 +322,6 @@ export default function (props: any) {
                 setIsStarted(false);
                 setIsResumed(false);
                 setIsReset(true);
-                setPauseTime(null);
                 setRecord({ type: 'reset' });
               }}
             >
@@ -329,8 +336,10 @@ export default function (props: any) {
               onClick={() => {
                 setIsResumed(false);
                 setIsReset(false);
-                setPauseTime(miliSecondsToSeconds(getNow()));
-                setRecord({ type: 'add', hours, minutes, seconds });
+                setRecord({ type: 'studyTime', hours, minutes, seconds });
+                setRestHours(0);
+                setRestMinutes(0);
+                setRestSeconds(0);
               }}
             >
               쉬기
@@ -346,7 +355,9 @@ export default function (props: any) {
                 // 휴식시간은 공부하기 버튼이 클릭될 때 측정됨
                 setRecord({
                   type: 'restTime',
-                  pauseTime,
+                  restHours,
+                  restMinutes,
+                  restSeconds,
                 });
               }}
             >
@@ -375,16 +386,19 @@ export default function (props: any) {
                 // 현재 공부시간을 측정 중인 경우
                 // 공부시간을 기록하고
                 // 일시정지 시간에 현재 시간을 저장
-                setRecord({ type: 'add', hours, minutes, seconds });
-                setPauseTime(miliSecondsToSeconds(getNow()));
+                setRecord({ type: 'studyTime', hours, minutes, seconds });
               } else {
                 // 현재 휴식시간을 측정 중인 경우
                 // 휴식시간을 기록하고
                 // 일시정지 시간을 null로 저장
                 // 일시정지 시간을 null로 저장함으로써
                 // 공부하기 버튼이 다시 클릭됐을 때 마지막 휴식시간을 변경하지 않음
-                setRecord({ type: 'restTime', pauseTime });
-                setPauseTime(null);
+                setRecord({
+                  type: 'restTime',
+                  restHours,
+                  restMinutes,
+                  restSeconds,
+                });
               }
               setIsStarted(false);
               setIsResumed(false);
