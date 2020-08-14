@@ -184,7 +184,7 @@ export default function (props: any) {
   const [isStarted, setIsStarted] = useState(false);
   const [isResumed, setIsResumed] = useState(false);
   const [isReset, setIsReset] = useState(false);
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpened, setIsOpened] = useState(false);
   const [record, setRecord] = useReducer(recordReducer, {
     heading: '',
     date: new Date(),
@@ -322,6 +322,7 @@ export default function (props: any) {
                 setIsStarted(false);
                 setIsResumed(false);
                 setIsReset(true);
+                setLocalStorageKey(null);
                 setRecord({ type: 'reset' });
               }}
             >
@@ -383,26 +384,23 @@ export default function (props: any) {
               }
 
               if (isResumed) {
-                // 현재 공부시간을 측정 중인 경우
-                // 공부시간을 기록하고
-                // 일시정지 시간에 현재 시간을 저장
+                // 현재 공부시간을 측정 중인 경우 공부시간을 기록
+                // 기록 후 휴식시간을 계속 측정
                 setRecord({ type: 'studyTime', hours, minutes, seconds });
+                setIsResumed(false);
               } else {
                 // 현재 휴식시간을 측정 중인 경우
-                // 휴식시간을 기록하고
-                // 일시정지 시간을 null로 저장
-                // 일시정지 시간을 null로 저장함으로써
-                // 공부하기 버튼이 다시 클릭됐을 때 마지막 휴식시간을 변경하지 않음
+                // 휴식시간을 기록 후 타이머를 멈춤
                 setRecord({
                   type: 'restTime',
                   restHours,
                   restMinutes,
                   restSeconds,
                 });
+                setIsStarted(false);
+                setIsResumed(false);
               }
-              setIsStarted(false);
-              setIsResumed(false);
-              setIsOpen(true);
+              setIsOpened(true);
             }}
           >
             저장하기
@@ -477,22 +475,31 @@ export default function (props: any) {
         </table>
       </section>
 
-      <Modal isOpen={isOpen}>
+      <Modal isOpened={isOpened}>
         <form
           className="Stopwatch-saveRecordsForm"
           onSubmit={(e) => {
             e.preventDefault();
             let key: string;
             if (localStorageKey === null) {
-              key = `${record.date} ${record.heading}`;
+              // 만약 스톱워치 사용중 저장한 적이 없으면
+              // 로컬 스토리지에 저장된 아이템의 개수에 1을 더해서 키값으로 설정
+              key = `${localStorage.length + 1}. ${record.heading}`;
               localStorage.setItem(key, JSON.stringify(record));
               setLocalStorageKey(key);
             } else {
-              key = `${record.date} ${record.heading}`;
+              // 스톱워치 사용중 저장한 적이 있으면
+              // 로컬스토리지에 저장된 아이템 개수를 기준으로 키값 설정
+              // 왜냐하면 현재 존재하는 마지막 아이템을 지운 후
+              // 다시 새 아이템을 로컬 스토리지에 저장할 것이므로
+              key = `${localStorage.length}. ${record.heading}`;
               localStorage.removeItem(localStorageKey);
               localStorage.setItem(key, JSON.stringify(record));
               setLocalStorageKey(key);
             }
+
+            setIsOpened(false);
+            setRecord({ type: 'heading', heading: '' });
           }}
         >
           <h3>공부기록 저장</h3>
@@ -515,7 +522,7 @@ export default function (props: any) {
               type="button"
               onClick={() => {
                 setRecord({ type: 'heading', heading: '' });
-                setIsOpen(false);
+                setIsOpened(false);
               }}
             >
               취소
