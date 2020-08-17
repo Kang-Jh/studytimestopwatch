@@ -11,18 +11,26 @@ export const miliSecondsToSeconds: (miliseconds: number) => number = (
 
 // getTime는 초로 표현된 시간값을 입력값으로 받아
 // 몇 시간, 몇 분, 몇 초인지를 구할 수 있게 해줌
-export const getTime: (timeAsSec: number) => Time = (
-  timeAsSec: number
+export const convertSecondsToTime: (seconds: number) => Time = (
+  sec: number
 ): Time => {
-  const hours: number = Math.floor(timeAsSec / 3600);
-  const minutes: number = Math.floor((timeAsSec - hours * 3600) / 60);
-  const seconds: number = timeAsSec - hours * 3600 - minutes * 60;
+  const hours: number = Math.floor(sec / 3600);
+  const minutes: number = Math.floor((sec - hours * 3600) / 60);
+  const seconds: number = sec - hours * 3600 - minutes * 60;
 
   return {
     hours,
     minutes,
     seconds,
   };
+};
+
+export const convertTimeToSeconds: (time: Time) => number = (time) => {
+  const hours = time.hours;
+  const minutes = time.minutes;
+  const seconds = time.seconds;
+
+  return hours * 3600 + minutes * 60 + seconds;
 };
 
 // 입력값이 10보다 작으면 앞에 0을 붙인 문자열을 return

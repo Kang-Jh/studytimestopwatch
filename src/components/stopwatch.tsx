@@ -5,7 +5,7 @@ import { Record, PeriodRecord } from '../@types/record';
 import {
   getNow,
   getDisplayTime,
-  getTime,
+  convertSecondsToTime,
   miliSecondsToSeconds,
 } from '../functions/time';
 import '../styles/stopwatch.css';
@@ -85,7 +85,7 @@ const recordReducer = (
           hours: netStudyTimeHours,
           minutes: netStudyTimeMinutes,
           seconds: netStudyTimeSeconds,
-        }: Time = getTime(netStudytime);
+        }: Time = convertSecondsToTime(netStudytime);
 
         lastPeriodRecord =
           newState.periodRecords[newState.periodRecords.length - 1];
@@ -225,7 +225,9 @@ export default function (props: any) {
         runningTime = getNow() - idleTime - mountTime;
         const nowAsSec: number = miliSecondsToSeconds(runningTime);
         // 초로 표현된 시간값을 시, 분, 초값으로 변환
-        const { hours, minutes, seconds }: Time = getTime(nowAsSec);
+        const { hours, minutes, seconds }: Time = convertSecondsToTime(
+          nowAsSec
+        );
 
         // 위에서 구한 시, 분, 초값을 state에 저장
         setHours(hours);
@@ -261,7 +263,7 @@ export default function (props: any) {
           hours: restHours,
           minutes: restMinutes,
           seconds: restSeconds,
-        }: Time = getTime(restTimeAsSec);
+        }: Time = convertSecondsToTime(restTimeAsSec);
 
         setRestHours(restHours);
         setRestMinutes(restMinutes);
