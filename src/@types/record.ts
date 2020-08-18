@@ -4,8 +4,8 @@ export interface Record {
   heading: string;
   date: Date;
   periodRecords: PeriodRecord[];
-  totalStudyTime?: Time;
-  totalRestTime?: Time;
+  totalStudyTime: Time;
+  totalRestTime: Time;
 }
 
 export interface PeriodRecord {
