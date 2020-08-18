@@ -44,6 +44,16 @@ const recordReducer = (
         date: state.date,
         periodRecords: [],
         heading: '',
+        totalStudyTime: {
+          hours: 0,
+          minutes: 0,
+          seconds: 0,
+        },
+        totalRestTime: {
+          hours: 0,
+          minutes: 0,
+          seconds: 0,
+        },
       };
     case 'studyTime':
       if (state.periodRecords.length === 0) {
@@ -64,9 +74,9 @@ const recordReducer = (
         // 현재 타이머에 표시된 시간과 기록되는 시간이
         // 같지 않으면 isChanged는 true, 같으면 false
         const isChanged: boolean =
-          (newState.totalStudyTime as Time).hours !== hours ||
-          (newState.totalStudyTime as Time).minutes !== minutes ||
-          (newState.totalStudyTime as Time).seconds !== seconds;
+          newState.totalStudyTime.hours !== hours ||
+          newState.totalStudyTime.minutes !== minutes ||
+          newState.totalStudyTime.seconds !== seconds;
 
         // 변하지 않았으면 state를 return
         if (!isChanged) {
@@ -77,9 +87,9 @@ const recordReducer = (
           hours * 3600 +
           minutes * 60 +
           seconds -
-          ((newState.totalStudyTime as Time).hours * 3600 +
-            (newState.totalStudyTime as Time).minutes * 60 +
-            (newState.totalStudyTime as Time).seconds);
+          (newState.totalStudyTime.hours * 3600 +
+            newState.totalStudyTime.minutes * 60 +
+            newState.totalStudyTime.seconds);
 
         const {
           hours: netStudyTimeHours,
@@ -125,39 +135,31 @@ const recordReducer = (
 
         // 총 휴식시간이 존재하는 경우 이전 총 휴식시간에 이번 교시 휴식시간을 더함
         // 존재하지 않을 경우 이번 교시 휴식시간을 총 휴식시간으로 설정
-        if (newState.totalRestTime) {
-          const lastTotalRestTime: Time = newState.totalRestTime;
-          const {
-            hours: lastHours,
-            minutes: lastMinutes,
-            seconds: lastSeconds,
-          } = lastTotalRestTime;
-          let hours = lastHours + restHours;
-          let minutes = lastMinutes + restMinutes;
-          let seconds = lastSeconds + restSeconds;
+        const lastTotalRestTime: Time = newState.totalRestTime;
+        const {
+          hours: lastHours,
+          minutes: lastMinutes,
+          seconds: lastSeconds,
+        } = lastTotalRestTime;
+        let hours = lastHours + restHours;
+        let minutes = lastMinutes + restMinutes;
+        let seconds = lastSeconds + restSeconds;
 
-          if (seconds >= 60) {
-            seconds -= 60;
-            minutes += 1;
-          }
-
-          if (minutes >= 60) {
-            minutes -= 60;
-            hours += 1;
-          }
-
-          newState.totalRestTime = {
-            hours,
-            minutes,
-            seconds,
-          };
-        } else {
-          newState.totalRestTime = {
-            hours: restHours,
-            minutes: restMinutes,
-            seconds: restSeconds,
-          };
+        if (seconds >= 60) {
+          seconds -= 60;
+          minutes += 1;
         }
+
+        if (minutes >= 60) {
+          minutes -= 60;
+          hours += 1;
+        }
+
+        newState.totalRestTime = {
+          hours,
+          minutes,
+          seconds,
+        };
       }
 
       periodRecords[periodRecords.length - 1] = lastPeriodRecord;
@@ -189,6 +191,16 @@ export default function (props: any) {
     heading: '',
     date: new Date(),
     periodRecords: [],
+    totalStudyTime: {
+      hours: 0,
+      minutes: 0,
+      seconds: 0,
+    },
+    totalRestTime: {
+      hours: 0,
+      minutes: 0,
+      seconds: 0,
+    },
   });
   const [localStorageKey, setLocalStorageKey] = useState<string | null>(null);
 
@@ -457,15 +469,13 @@ export default function (props: any) {
 
           <tfoot>
             <tr>
-              <th scope="row">총합</th>
-              {record.totalStudyTime && (
-                <td>
-                  {getDisplayTime(record.totalStudyTime.hours)}:
-                  {getDisplayTime(record.totalStudyTime.minutes)}:
-                  {getDisplayTime(record.totalStudyTime.seconds)}
-                </td>
-              )}
-              {record.totalRestTime && (
+              <th scope="row" colSpan={2}>
+                총 휴식시간
+              </th>
+              {/* 총 휴식시간이 0이 아닐 때만 총 휴식시간을 화면에 렌더링 */}
+              {(record.totalRestTime.hours !== 0 ||
+                record.totalRestTime.minutes !== 0 ||
+                record.totalRestTime.seconds !== 0) && (
                 <td>
                   {getDisplayTime(record.totalRestTime.hours)}:
                   {getDisplayTime(record.totalRestTime.minutes)}:
