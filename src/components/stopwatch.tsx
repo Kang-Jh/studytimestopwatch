@@ -31,9 +31,6 @@ const recordReducer = (
     minutes = 0,
     seconds = 0,
     heading = '',
-    restHours = 0,
-    restMinutes = 0,
-    restSeconds = 0,
   }: StopwatchActionParameter
 ): Record => {
   let newState: Record = { ...state };
@@ -128,9 +125,9 @@ const recordReducer = (
       if (lastPeriodRecord && lastPeriodRecord.restTimeHours === undefined) {
         lastPeriodRecord = {
           ...lastPeriodRecord,
-          restTimeHours: restHours,
-          restTimeMinutes: restMinutes,
-          restTimeSeconds: restSeconds,
+          restTimeHours: hours,
+          restTimeMinutes: minutes,
+          restTimeSeconds: seconds,
         };
 
         // 총 휴식시간이 존재하는 경우 이전 총 휴식시간에 이번 교시 휴식시간을 더함
@@ -139,9 +136,9 @@ const recordReducer = (
         let newTotalRestTime: Time = convertSecondsToTime(
           convertTimeToSeconds(lastTotalRestTime) +
             convertTimeToSeconds({
-              hours: restHours,
-              minutes: restMinutes,
-              seconds: restSeconds,
+              hours: hours,
+              minutes: minutes,
+              seconds: seconds,
             })
         );
         newState.totalRestTime = newTotalRestTime;
@@ -361,9 +358,9 @@ export default function (props: any) {
                 // 휴식시간은 공부하기 버튼이 클릭될 때 측정됨
                 setRecord({
                   type: 'restTime',
-                  restHours: restTime.hours,
-                  restMinutes: restTime.minutes,
-                  restSeconds: restTime.seconds,
+                  hours: restTime.hours,
+                  minutes: restTime.minutes,
+                  seconds: restTime.seconds,
                 });
               }}
             >
@@ -403,9 +400,9 @@ export default function (props: any) {
                 // 휴식시간을 기록 후 타이머를 멈춤
                 setRecord({
                   type: 'restTime',
-                  restHours: restTime.hours,
-                  restMinutes: restTime.minutes,
-                  restSeconds: restTime.seconds,
+                  hours: restTime.hours,
+                  minutes: restTime.minutes,
+                  seconds: restTime.seconds,
                 });
                 setIsStarted(false);
                 setIsResumed(false);
