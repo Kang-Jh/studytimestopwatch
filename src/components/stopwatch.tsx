@@ -17,9 +17,6 @@ interface StopwatchActionParameter {
   minutes?: number;
   seconds?: number;
   heading?: string;
-  restHours?: number;
-  restMinutes?: number;
-  restSeconds?: number;
 }
 // recordsReducer는 일시정지 버튼이 클릭될 때마다 클릭된 시간을 기록
 // 또는 리셋 버튼이 클릭될 경우 모든 기록을 삭제
