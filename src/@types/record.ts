@@ -2,7 +2,7 @@ import { Time } from './time';
 
 export interface Record {
   heading: string;
-  date: Date;
+  date: string;
   periodRecords: PeriodRecord[];
   totalStudyTime: Time;
   totalRestTime: Time;
