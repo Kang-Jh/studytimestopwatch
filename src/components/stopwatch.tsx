@@ -1,9 +1,10 @@
 import React, { useState, useLayoutEffect, useRef, useReducer } from 'react';
 import Modal from './modal';
-import { Time } from '../@types/time';
+import { Time, Day } from '../@types/time';
 import { Record, PeriodRecord } from '../@types/record';
 import {
   getNow,
+  getDayAsKorean,
   getDisplayTime,
   convertSecondsToTime,
   convertTimeToSeconds,
@@ -171,7 +172,9 @@ export default function (props: any) {
   const [isResumed, setIsResumed] = useState(false);
   const [record, setRecord] = useReducer(recordReducer, {
     heading: '',
-    date: new Date(),
+    date: `${new Date().getFullYear()}년 ${new Date().getMonth()}월 ${new Date().getDate()}일 ${getDayAsKorean(
+      new Date().getDay() as Day
+    )}요일`,
     periodRecords: [],
     totalStudyTime: {
       hours: 0,
@@ -280,12 +283,13 @@ export default function (props: any) {
 
   return (
     <main className="Stopwatch">
-      <h2 className="srOnly">스톱워치</h2>
+      <h2 className="srOnly">스톱워치 및 공부기록</h2>
 
-      <section>
+      <article>
+        <h3 className="srOnly">스톱워치</h3>
         {isStarted && !isResumed ? (
           <>
-            <h3 className="Stopwatch-sectionHeader">휴식중...</h3>
+            <h4 className="Stopwatch-sectionHeader">휴식중...</h4>
 
             <div className="Stopwatch-stopwatchDisplay">
               {getDisplayTime(restTime.hours)}:
@@ -298,9 +302,9 @@ export default function (props: any) {
             {/* 초기 상태 또는 리셋 상태일 경우 스크린 리더들에게만 보이는 헤딩을 보여줌 */}
             {/* 공부하기가 클릭된 경우 공부중... 이라는 헤딩을 보여줌  */}
             {isStarted ? (
-              <h3 className="Stopwatch-sectionHeader">공부중...</h3>
+              <h4 className="Stopwatch-sectionHeader">공부중...</h4>
             ) : (
-              <h3 className="srOnly">스톱워치 디스플레이</h3>
+              <h4 className="srOnly">스톱워치 디스플레이</h4>
             )}
 
             <div className="Stopwatch-stopwatchDisplay">
@@ -312,7 +316,8 @@ export default function (props: any) {
         )}
 
         <div>
-          {isStarted && (
+          {/* 타이머가 한 번이라도 측정되었거나 기록이 저장되었으면 리셋 버튼을 표시 */}
+          {(isStarted || localStorageKey) && (
             <button
               className="Stopwatch-button Stopwatch-background-white"
               type="button"
@@ -366,10 +371,84 @@ export default function (props: any) {
             </button>
           )}
         </div>
-      </section>
+      </article>
 
-      <section className="Stopwatch-studyRecords-section">
-        <h3 className="srOnly">공부기록</h3>
+      <div className="Stopwatch-studyRecords-section">
+        {/* TODO article 부분을 RecordRenderer 컴포넌트를 만들어서 대체하기 */}
+        <article>
+          <h3 className="srOnly">공부기록</h3>
+          <table className="Stopwatch-table">
+            <thead>
+              <tr>
+                <th scope="col">교시</th>
+                <th scope="col">공부시간</th>
+                <th scope="col">휴식시간</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              {record.periodRecords.map(
+                ({
+                  period,
+                  netStudyTimeHours,
+                  netStudyTimeMinutes,
+                  netStudyTimeSeconds,
+                  restTimeHours,
+                  restTimeMinutes,
+                  restTimeSeconds,
+                }) => (
+                  <tr key={period}>
+                    <td>{period}</td>
+
+                    <td>
+                      <span>
+                        {getDisplayTime(netStudyTimeHours as number)}:
+                        {getDisplayTime(netStudyTimeMinutes as number)}:
+                        {getDisplayTime(netStudyTimeSeconds as number)}
+                      </span>
+                    </td>
+
+                    {/* restTime_hours가 undefined가 아니면 나머지 restTime들도 undefined가 아니므로 restTime_hours만 사용 */}
+                    {restTimeHours !== undefined && (
+                      <td>
+                        <span>
+                          {getDisplayTime(restTimeHours)}:
+                          {getDisplayTime(restTimeMinutes as number)}:
+                          {getDisplayTime(restTimeSeconds as number)}
+                        </span>
+                      </td>
+                    )}
+                  </tr>
+                )
+              )}
+            </tbody>
+
+            <tfoot>
+              <tr>
+                <th scope="row">총합</th>
+                {(record.totalStudyTime.hours !== 0 ||
+                  record.totalStudyTime.minutes !== 0 ||
+                  record.totalStudyTime.seconds !== 0) && (
+                  <td>
+                    {getDisplayTime(record.totalStudyTime.hours)}:
+                    {getDisplayTime(record.totalStudyTime.minutes)}:
+                    {getDisplayTime(record.totalStudyTime.seconds)}
+                  </td>
+                )}
+                {/* 총 휴식시간이 0이 아닐 때만 총 휴식시간을 화면에 렌더링 */}
+                {(record.totalRestTime.hours !== 0 ||
+                  record.totalRestTime.minutes !== 0 ||
+                  record.totalRestTime.seconds !== 0) && (
+                  <td>
+                    {getDisplayTime(record.totalRestTime.hours)}:
+                    {getDisplayTime(record.totalRestTime.minutes)}:
+                    {getDisplayTime(record.totalRestTime.seconds)}
+                  </td>
+                )}
+              </tr>
+            </tfoot>
+          </table>
+        </article>
 
         <div className="textAlign-right">
           {/* 저장하기 버튼은 저장하기 modal을 여는 역할을 함 */}
@@ -411,79 +490,7 @@ export default function (props: any) {
             저장하기
           </button>
         </div>
-
-        <table className="Stopwatch-table">
-          <thead>
-            <tr>
-              <th scope="col">교시</th>
-              <th scope="col">공부시간</th>
-              <th scope="col">휴식시간</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            {record.periodRecords.map(
-              ({
-                period,
-                netStudyTimeHours,
-                netStudyTimeMinutes,
-                netStudyTimeSeconds,
-                restTimeHours,
-                restTimeMinutes,
-                restTimeSeconds,
-              }) => (
-                <tr key={period}>
-                  <td>{period}</td>
-
-                  <td>
-                    <span>
-                      {getDisplayTime(netStudyTimeHours as number)}:
-                      {getDisplayTime(netStudyTimeMinutes as number)}:
-                      {getDisplayTime(netStudyTimeSeconds as number)}
-                    </span>
-                  </td>
-
-                  {/* restTime_hours가 undefined가 아니면 나머지 restTime들도 undefined가 아니므로 restTime_hours만 사용 */}
-                  {restTimeHours !== undefined && (
-                    <td>
-                      <span>
-                        {getDisplayTime(restTimeHours)}:
-                        {getDisplayTime(restTimeMinutes as number)}:
-                        {getDisplayTime(restTimeSeconds as number)}
-                      </span>
-                    </td>
-                  )}
-                </tr>
-              )
-            )}
-          </tbody>
-
-          <tfoot>
-            <tr>
-              <th scope="row">총합</th>
-              {(record.totalStudyTime.hours !== 0 ||
-                record.totalStudyTime.minutes !== 0 ||
-                record.totalStudyTime.seconds !== 0) && (
-                <td>
-                  {getDisplayTime(record.totalStudyTime.hours)}:
-                  {getDisplayTime(record.totalStudyTime.minutes)}:
-                  {getDisplayTime(record.totalStudyTime.seconds)}
-                </td>
-              )}
-              {/* 총 휴식시간이 0이 아닐 때만 총 휴식시간을 화면에 렌더링 */}
-              {(record.totalRestTime.hours !== 0 ||
-                record.totalRestTime.minutes !== 0 ||
-                record.totalRestTime.seconds !== 0) && (
-                <td>
-                  {getDisplayTime(record.totalRestTime.hours)}:
-                  {getDisplayTime(record.totalRestTime.minutes)}:
-                  {getDisplayTime(record.totalRestTime.seconds)}
-                </td>
-              )}
-            </tr>
-          </tfoot>
-        </table>
-      </section>
+      </div>
 
       <Modal isOpened={isModalOpened}>
         <form
