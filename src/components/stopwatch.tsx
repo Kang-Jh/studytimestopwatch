@@ -32,6 +32,7 @@ const recordReducer = (
 ): Record => {
   let newState: Record = { ...state };
   let lastPeriodRecord: PeriodRecord;
+  let periodRecords: PeriodRecord[];
 
   switch (type) {
     case 'reset':
@@ -52,7 +53,7 @@ const recordReducer = (
       };
     case 'studyTime':
       if (state.periodRecords.length === 0) {
-        const periodRecords = [];
+        periodRecords = [];
         // net이 붙은 prop들은 순공부시간을 의미
         // net이 붙지 않은 prop들은 일시정지가 눌렸을 때의 시간을 의미
         // net이 붙은 값들은 모두 이전 일시정지부터 얼마만큼 공부했는지를 나타냄
@@ -95,7 +96,7 @@ const recordReducer = (
         lastPeriodRecord = state.periodRecords[state.periodRecords.length - 1];
         const lastPeriod = lastPeriodRecord.period as number;
 
-        const periodRecords = [...state.periodRecords];
+        periodRecords = [...state.periodRecords];
         periodRecords.push({
           period: lastPeriod + 1,
           netStudyTimeHours,
@@ -113,7 +114,7 @@ const recordReducer = (
 
       return newState;
     case 'restTime':
-      const periodRecords = [...state.periodRecords];
+      periodRecords = [...state.periodRecords];
 
       // 마지막 교시 기록에 휴식시간이 존재하지 않으면
       // 휴식시간을 기록에 추가
