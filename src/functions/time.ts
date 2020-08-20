@@ -1,4 +1,4 @@
-import { Time, TimeObject } from '../@types/time';
+import { Time, TimeObject, Day } from '../@types/time';
 
 // performance가 존재하지 않으면 Date로 대체
 export const timeObject: TimeObject =
@@ -28,6 +28,48 @@ export const convertTimeToSeconds = (time: Time): number => {
   const seconds = time.seconds;
 
   return hours * 3600 + minutes * 60 + seconds;
+};
+
+export const convertTimeAsKorean = (time: Time): string => {
+  const { hours, minutes, seconds } = time;
+
+  return `${hours}시간 ${minutes}분 ${seconds}초`;
+};
+/**
+ * get day
+ * @param {Day} number - Day as a number. 0 represent Sunday, 6 Represent Saturday
+ * @return {string} Present a day as a Korean word
+ */
+export const getDayAsKorean = (number: Day): string => {
+  if (number === 0) {
+    return '일';
+  }
+
+  if (number === 1) {
+    return '월';
+  }
+
+  if (number === 2) {
+    return '화';
+  }
+
+  if (number === 3) {
+    return '수';
+  }
+
+  if (number === 4) {
+    return '목';
+  }
+
+  if (number === 5) {
+    return '금';
+  }
+
+  if (number === 6) {
+    return '토';
+  }
+
+  throw new Error('올바른 인자가 아닙니다');
 };
 
 // 입력값이 10보다 작으면 앞에 0을 붙인 문자열을 return
