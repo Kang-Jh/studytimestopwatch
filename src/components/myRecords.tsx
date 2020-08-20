@@ -5,8 +5,9 @@ import '../styles/myRecords.css';
 import {
   convertSecondsToTime,
   convertTimeToSeconds,
-  getDisplayTime,
+  convertTimeAsKorean,
 } from '../functions/time';
+import { Link } from 'react-router-dom';
 
 interface MyRecordsActionParameter {
   type: string;
@@ -28,6 +29,7 @@ const recordsReducer = (
 
 export default function (props: any): ReactElement {
   const [records, setRecords] = useReducer(recordsReducer, []);
+  const [dates, setDates] = useState<string[]>([]);
   const [totalPeriod, setTotalPeriod] = useState(0);
   const [totalStudyTime, setTotalStudyTime] = useState<Time>({
     hours: 0,
@@ -50,9 +52,10 @@ export default function (props: any): ReactElement {
     seconds: 0,
   });
 
-  // effect to init records
+  // effect to init states
   useEffect(() => {
     let records: Record[] = [];
+    let dates: string[] = [];
     if (localStorage.length === 0) {
       return;
     }
@@ -62,8 +65,13 @@ export default function (props: any): ReactElement {
       const record: Record = JSON.parse(
         localStorage.getItem(key) as string
       ) as Record;
-
       records.push(record);
+
+      // dates에 record의 날짜가 포함되어있지 않으면
+      // dates에 날짜를 포함시킴
+      if (!dates.includes(record.date)) {
+        dates.push(record.date);
+      }
     }
 
     let totalPeriod: number = 0;
@@ -85,9 +93,12 @@ export default function (props: any): ReactElement {
       );
     }
 
+    // 날짜를 오름차순으로 정렬
+    dates.sort();
     avgStudyTime = Math.round(totalStudyTime / totalPeriod);
     avgRestTime = Math.round(totalRestTime / totalPeriod);
     setRecords({ type: 'init', records });
+    setDates(dates);
     setTotalPeriod(totalPeriod);
     setTotalStudyTime(convertSecondsToTime(totalStudyTime));
     setTotalRestTime(convertSecondsToTime(totalRestTime));
@@ -98,7 +109,7 @@ export default function (props: any): ReactElement {
   return (
     <main className="MyRecords">
       <div className="MyRecords-statistic">
-        <h2>통계</h2>
+        <h2>전체 통계</h2>
 
         <div>
           <span>총 교시</span>
@@ -107,39 +118,52 @@ export default function (props: any): ReactElement {
 
         <div>
           <span>총 공부시간</span>
-          <span>
-            {getDisplayTime(totalStudyTime.hours)}:
-            {getDisplayTime(totalStudyTime.minutes)}:
-            {getDisplayTime(totalStudyTime.seconds)}
-          </span>
+          <span>{convertTimeAsKorean(totalStudyTime)}</span>
         </div>
 
         <div>
           <span>총 휴식시간</span>
-          <span>
-            {getDisplayTime(totalRestTime.hours)}:
-            {getDisplayTime(totalRestTime.minutes)}:
-            {getDisplayTime(totalRestTime.seconds)}
-          </span>
+          <span>{convertTimeAsKorean(totalRestTime)}</span>
         </div>
 
         <div>
           <span>교시당 공부시간</span>
-          <span>
-            {getDisplayTime(avgStudyTime.hours)}:
-            {getDisplayTime(avgStudyTime.minutes)}:
-            {getDisplayTime(avgStudyTime.seconds)}
-          </span>
+          <span>{convertTimeAsKorean(avgStudyTime)}</span>
         </div>
 
         <div>
           <span>교시당 휴식시간</span>
-          <span>
-            {getDisplayTime(avgRestTime.hours)}:
-            {getDisplayTime(avgRestTime.minutes)}:
-            {getDisplayTime(avgRestTime.seconds)}
-          </span>
+          <span>{convertTimeAsKorean(avgRestTime)}</span>
         </div>
+      </div>
+
+      <div>
+        <h2>공부 기록 목록</h2>
+        <ol>
+          {/* 날짜를 기준으로 기록을 분류 */}
+          {dates.map((date) => (
+            <li key={date}>
+              {date}
+              <ul>
+                {/* 기록에서 같은 날짜인 것들만 필터링 해서 렌더링 */}
+                {records
+                  .filter((record) => date === record.date)
+                  .map((record, index) => (
+                    <li key={index}>
+                      <h3>{record.heading}</h3>
+                      <div>{record.date}</div>
+                      <div>
+                        공부시간 {convertTimeAsKorean(record.totalStudyTime)}
+                      </div>
+                      <div>
+                        휴식시간 {convertTimeAsKorean(record.totalRestTime)}
+                      </div>
+                    </li>
+                  ))}
+              </ul>
+            </li>
+          ))}
+        </ol>
       </div>
     </main>
   );
