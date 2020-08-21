@@ -30,23 +30,35 @@ const recordsReducer = (
 
 export default function (props: any): ReactElement {
   const [records, setRecords] = useReducer(recordsReducer, []);
-  const [dates, setDates] = useState<string[]>([]);
-  const [totalPeriod, setTotalPeriod] = useState(0);
-  const [totalStudyTime, setTotalStudyTime] = useState<Time>({
-    hours: 0,
-    minutes: 0,
-    seconds: 0,
-  });
-  const [totalRestTime, setTotalRestTime] = useState<Time>({
-    hours: 0,
-    minutes: 0,
-    seconds: 0,
-  });
+  const dates = [...new Set(records.map((record) => record.date))].sort();
+  const totalPeriod: number = (records as Array<any>).reduce(
+    (prev: number, current: Record): number => {
+      return prev + current.periodRecords.length;
+    },
+    0
+  );
+  const totalStudyTime: Time = (records as Array<any>).reduce(
+    (prev: Time, current: Record): Time => {
+      return convertSecondsToTime(
+        convertTimeToSeconds(prev) +
+          convertTimeToSeconds(current.totalStudyTime)
+      );
+    },
+    { hours: 0, minutes: 0, seconds: 0 }
+  );
+
+  const totalRestTime: Time = (records as Array<any>).reduce(
+    (prev: Time, current: Record): Time => {
+      return convertSecondsToTime(
+        convertTimeToSeconds(prev) + convertTimeToSeconds(current.totalRestTime)
+      );
+    },
+    { hours: 0, minutes: 0, seconds: 0 }
+  );
 
   // effect to init states
   useEffect(() => {
     let records: Record[] = [];
-    let dates: string[] = [];
     if (localStorage.length === 0) {
       return;
     }
@@ -57,38 +69,9 @@ export default function (props: any): ReactElement {
         localStorage.getItem(key) as string
       ) as Record;
       records.push({ ...record, key });
-
-      // dates에 record의 날짜가 포함되어있지 않으면
-      // dates에 날짜를 포함시킴
-      if (!dates.includes(record.date)) {
-        dates.push(record.date);
-      }
     }
 
-    let totalPeriod: number = 0;
-    let totalStudyTime: number = 0;
-    let totalRestTime: number = 0;
-    for (let record of records) {
-      const periodRecords: PeriodRecord[] = record.periodRecords;
-      totalPeriod += periodRecords.length;
-      // totalStudyTime은 항상 record에 항상 존재함
-      totalStudyTime += convertTimeToSeconds(record.totalStudyTime as Time);
-      // totalRestTime의 경우 1교시 공부중에 저장한 경우
-      // totalRestTIme이 존재하지 않음
-      totalRestTime += convertTimeToSeconds(
-        record.totalRestTime
-          ? record.totalRestTime
-          : { hours: 0, minutes: 0, seconds: 0 }
-      );
-    }
-
-    // 날짜를 오름차순으로 정렬
-    dates.sort();
     setRecords({ type: 'init', records });
-    setDates(dates);
-    setTotalPeriod(totalPeriod);
-    setTotalStudyTime(convertSecondsToTime(totalStudyTime));
-    setTotalRestTime(convertSecondsToTime(totalRestTime));
   }, []);
 
   return (
