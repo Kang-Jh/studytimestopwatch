@@ -1,6 +1,7 @@
 import { Time } from './time';
 
 export interface Record {
+  key?: string;
   heading: string;
   date: string;
   periodRecords: PeriodRecord[];
