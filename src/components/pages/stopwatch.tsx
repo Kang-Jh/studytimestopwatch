@@ -188,7 +188,7 @@ export default function (props: any) {
     },
   });
   const [isModalOpened, setIsModalOpened] = useState(false);
-  const [localStorageKey, setLocalStorageKey] = useState<string | null>(null);
+  const localStorageKeyRef = useRef('');
 
   // 리셋 이펙트로 실행시간 ref를 초기화
   useLayoutEffect(() => {
@@ -317,16 +317,16 @@ export default function (props: any) {
 
         <div>
           {/* 타이머가 한 번이라도 측정되었거나 기록이 저장되었으면 리셋 버튼을 표시 */}
-          {(isStarted || localStorageKey) && (
+          {(isStarted || localStorageKeyRef.current) && (
             <button
               className="Stopwatch-button Stopwatch-background-white"
               type="button"
               onClick={() => {
+                localStorageKeyRef.current = '';
                 setStudyTime({ hours: 0, minutes: 0, seconds: 0 });
                 setRestTime({ hours: 0, minutes: 0, seconds: 0 });
                 setIsStarted(false);
                 setIsResumed(false);
-                setLocalStorageKey(null);
                 setRecord({ type: 'reset' });
               }}
             >
@@ -498,21 +498,21 @@ export default function (props: any) {
           onSubmit={(e) => {
             e.preventDefault();
             let key: string;
-            if (localStorageKey === null) {
+            if (localStorageKeyRef.current === '') {
               // 만약 스톱워치 사용중 저장한 적이 없으면
               // 로컬 스토리지에 저장된 아이템의 개수에 1을 더해서 키값으로 설정
               key = `${localStorage.length + 1}. ${record.heading}`;
               localStorage.setItem(key, JSON.stringify(record));
-              setLocalStorageKey(key);
+              localStorageKeyRef.current = key;
             } else {
               // 스톱워치 사용중 저장한 적이 있으면
               // 로컬스토리지에 저장된 아이템 개수를 기준으로 키값 설정
               // 왜냐하면 현재 존재하는 마지막 아이템을 지운 후
               // 다시 새 아이템을 로컬 스토리지에 저장할 것이므로
               key = `${localStorage.length}. ${record.heading}`;
-              localStorage.removeItem(localStorageKey);
+              localStorage.removeItem(localStorageKeyRef.current);
               localStorage.setItem(key, JSON.stringify(record));
-              setLocalStorageKey(key);
+              localStorageKeyRef.current = key;
             }
 
             setIsModalOpened(false);
