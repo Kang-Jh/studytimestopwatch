@@ -375,80 +375,78 @@ export default function (props: any) {
 
       <div className="Stopwatch-studyRecords-section">
         {/* TODO article 부분을 RecordRenderer 컴포넌트를 만들어서 대체하기 */}
-        <article>
-          <h3 className="srOnly">공부기록</h3>
-          <table className="Stopwatch-table">
-            <thead>
-              <tr>
-                <th scope="col">교시</th>
-                <th scope="col">공부시간</th>
-                <th scope="col">휴식시간</th>
-              </tr>
-            </thead>
+        <h3 className="srOnly">공부기록</h3>
+        <table className="Stopwatch-table">
+          <thead>
+            <tr>
+              <th scope="col">교시</th>
+              <th scope="col">공부시간</th>
+              <th scope="col">휴식시간</th>
+            </tr>
+          </thead>
 
-            <tbody>
-              {record.periodRecords.map(
-                ({
-                  period,
-                  netStudyTimeHours,
-                  netStudyTimeMinutes,
-                  netStudyTimeSeconds,
-                  restTimeHours,
-                  restTimeMinutes,
-                  restTimeSeconds,
-                }) => (
-                  <tr key={period}>
-                    <td>{period}</td>
+          <tbody>
+            {record.periodRecords.map(
+              ({
+                period,
+                netStudyTimeHours,
+                netStudyTimeMinutes,
+                netStudyTimeSeconds,
+                restTimeHours,
+                restTimeMinutes,
+                restTimeSeconds,
+              }) => (
+                <tr key={period}>
+                  <td>{period}</td>
 
+                  <td>
+                    <span>
+                      {getDisplayTime(netStudyTimeHours as number)}:
+                      {getDisplayTime(netStudyTimeMinutes as number)}:
+                      {getDisplayTime(netStudyTimeSeconds as number)}
+                    </span>
+                  </td>
+
+                  {/* restTime_hours가 undefined가 아니면 나머지 restTime들도 undefined가 아니므로 restTime_hours만 사용 */}
+                  {restTimeHours !== undefined && (
                     <td>
                       <span>
-                        {getDisplayTime(netStudyTimeHours as number)}:
-                        {getDisplayTime(netStudyTimeMinutes as number)}:
-                        {getDisplayTime(netStudyTimeSeconds as number)}
+                        {getDisplayTime(restTimeHours)}:
+                        {getDisplayTime(restTimeMinutes as number)}:
+                        {getDisplayTime(restTimeSeconds as number)}
                       </span>
                     </td>
+                  )}
+                </tr>
+              )
+            )}
+          </tbody>
 
-                    {/* restTime_hours가 undefined가 아니면 나머지 restTime들도 undefined가 아니므로 restTime_hours만 사용 */}
-                    {restTimeHours !== undefined && (
-                      <td>
-                        <span>
-                          {getDisplayTime(restTimeHours)}:
-                          {getDisplayTime(restTimeMinutes as number)}:
-                          {getDisplayTime(restTimeSeconds as number)}
-                        </span>
-                      </td>
-                    )}
-                  </tr>
-                )
+          <tfoot>
+            <tr>
+              <th scope="row">총합</th>
+              {(record.totalStudyTime.hours !== 0 ||
+                record.totalStudyTime.minutes !== 0 ||
+                record.totalStudyTime.seconds !== 0) && (
+                <td>
+                  {getDisplayTime(record.totalStudyTime.hours)}:
+                  {getDisplayTime(record.totalStudyTime.minutes)}:
+                  {getDisplayTime(record.totalStudyTime.seconds)}
+                </td>
               )}
-            </tbody>
-
-            <tfoot>
-              <tr>
-                <th scope="row">총합</th>
-                {(record.totalStudyTime.hours !== 0 ||
-                  record.totalStudyTime.minutes !== 0 ||
-                  record.totalStudyTime.seconds !== 0) && (
-                  <td>
-                    {getDisplayTime(record.totalStudyTime.hours)}:
-                    {getDisplayTime(record.totalStudyTime.minutes)}:
-                    {getDisplayTime(record.totalStudyTime.seconds)}
-                  </td>
-                )}
-                {/* 총 휴식시간이 0이 아닐 때만 총 휴식시간을 화면에 렌더링 */}
-                {(record.totalRestTime.hours !== 0 ||
-                  record.totalRestTime.minutes !== 0 ||
-                  record.totalRestTime.seconds !== 0) && (
-                  <td>
-                    {getDisplayTime(record.totalRestTime.hours)}:
-                    {getDisplayTime(record.totalRestTime.minutes)}:
-                    {getDisplayTime(record.totalRestTime.seconds)}
-                  </td>
-                )}
-              </tr>
-            </tfoot>
-          </table>
-        </article>
+              {/* 총 휴식시간이 0이 아닐 때만 총 휴식시간을 화면에 렌더링 */}
+              {(record.totalRestTime.hours !== 0 ||
+                record.totalRestTime.minutes !== 0 ||
+                record.totalRestTime.seconds !== 0) && (
+                <td>
+                  {getDisplayTime(record.totalRestTime.hours)}:
+                  {getDisplayTime(record.totalRestTime.minutes)}:
+                  {getDisplayTime(record.totalRestTime.seconds)}
+                </td>
+              )}
+            </tr>
+          </tfoot>
+        </table>
 
         <div className="textAlign-right">
           {/* 저장하기 버튼은 저장하기 modal을 여는 역할을 함 */}
