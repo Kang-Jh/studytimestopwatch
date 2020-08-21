@@ -19,12 +19,27 @@ export default function ({
   totalStudyTime,
   totalRestTime,
 }: StatisticProps): ReactElement {
-  const averageStudyTime: Time = convertSecondsToTime(
-    Math.round(convertTimeToSeconds(totalStudyTime) / totalPeriod)
-  );
-  const averageRestTime: Time = convertSecondsToTime(
-    Math.round(convertTimeToSeconds(totalRestTime) / totalPeriod)
-  );
+  let initialAverageTime: Time = { hours: 0, minutes: 0, seconds: 0 };
+  let averageStudyTime: Time;
+  let averageRestTime: Time;
+
+  // 총 공부한 교시가 0교시일 경우
+  // 교시당 공부시간과 휴식시간은 모두 0시간 0분 0초
+  // 공부한 교시가 1교시 이상일 경우
+  // 교시당 공부시간과 휴식시간을 계산함
+  if (totalPeriod === 0) {
+    averageStudyTime = initialAverageTime;
+    averageRestTime = initialAverageTime;
+  } else {
+    averageStudyTime = convertSecondsToTime(
+      Math.round(convertTimeToSeconds(totalStudyTime) / totalPeriod)
+    );
+
+    averageRestTime = convertSecondsToTime(
+      Math.round(convertTimeToSeconds(totalRestTime) / totalPeriod)
+    );
+  }
+
   return (
     <article>
       <h2>{heading}</h2>
