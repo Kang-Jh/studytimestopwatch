@@ -1,5 +1,5 @@
-import React, { useState, useReducer, useEffect, ReactElement } from 'react';
-import { Record, PeriodRecord } from '../../@types/record';
+import React, { useReducer, useEffect, ReactElement } from 'react';
+import { Record } from '../../@types/record';
 import { Time } from '../../@types/time';
 import '../../styles/myRecords.css';
 import {
@@ -31,29 +31,21 @@ const recordsReducer = (
 export default function (props: any): ReactElement {
   const [records, setRecords] = useReducer(recordsReducer, []);
   const dates = [...new Set(records.map((record) => record.date))].sort();
-  const totalPeriod: number = (records as Array<any>).reduce(
-    (prev: number, current: Record): number => {
-      return prev + current.periodRecords.length;
+  const totalPeriod: number = (records as any[]).reduce(
+    (prevTotalPeriod: number, record: Record): number => {
+      return prevTotalPeriod + record.periodRecords.length;
     },
     0
   );
-  const totalStudyTime: Time = (records as Array<any>).reduce(
-    (prev: Time, current: Record): Time => {
-      return convertSecondsToTime(
-        convertTimeToSeconds(prev) +
-          convertTimeToSeconds(current.totalStudyTime)
-      );
-    },
-    { hours: 0, minutes: 0, seconds: 0 }
+  const totalStudyTime: Time = convertSecondsToTime(
+    (records as any[]).reduce((timeAsSec: number, record: Record): number => {
+      return timeAsSec + convertTimeToSeconds(record.totalStudyTime);
+    }, 0)
   );
-
-  const totalRestTime: Time = (records as Array<any>).reduce(
-    (prev: Time, current: Record): Time => {
-      return convertSecondsToTime(
-        convertTimeToSeconds(prev) + convertTimeToSeconds(current.totalRestTime)
-      );
-    },
-    { hours: 0, minutes: 0, seconds: 0 }
+  const totalRestTime: Time = convertSecondsToTime(
+    (records as any[]).reduce((timeAsSec: number, record: Record): number => {
+      return timeAsSec + convertTimeToSeconds(record.totalRestTime);
+    }, 0)
   );
 
   // effect to init states
