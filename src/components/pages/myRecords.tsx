@@ -1,4 +1,4 @@
-import React, { useReducer, useEffect, ReactElement } from 'react';
+import React, { useState, useEffect, ReactElement } from 'react';
 import { Record } from '../../@types/record';
 import { Time } from '../../@types/time';
 import '../../styles/myRecords.css';
@@ -10,26 +10,8 @@ import {
 import { Link } from 'react-router-dom';
 import Statistic from '../statistic';
 
-interface MyRecordsActionParameter {
-  type: string;
-  records?: Record[];
-}
-
-const recordsReducer = (
-  state: Record[],
-  { type, records = [] }: MyRecordsActionParameter
-): Record[] => {
-  const newState: Record[] = [...state];
-  switch (type) {
-    case 'init':
-      return records;
-    default:
-      return [];
-  }
-};
-
 export default function (props: any): ReactElement {
-  const [records, setRecords] = useReducer(recordsReducer, []);
+  const [records, setRecords] = useState<Record[]>([]);
   const dates = [...new Set(records.map((record) => record.date))].sort();
   const totalPeriod: number = (records as any[]).reduce(
     (prevTotalPeriod: number, record: Record): number => {
@@ -63,11 +45,21 @@ export default function (props: any): ReactElement {
       records.push({ ...record, key });
     }
 
-    setRecords({ type: 'init', records });
+    setRecords(records);
   }, []);
 
   return (
     <main className="MyRecords">
+      <div>
+        <button
+          onClick={() => {
+            localStorage.clear();
+            setRecords([]);
+          }}
+        >
+          리셋
+        </button>
+      </div>
       <Statistic
         heading="전체 통계"
         totalPeriod={totalPeriod}
