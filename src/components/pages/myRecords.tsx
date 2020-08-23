@@ -42,6 +42,7 @@ export default function (props: any): ReactElement {
       const record: Record = JSON.parse(
         localStorage.getItem(key) as string
       ) as Record;
+      // id is started from 1, not 0
       records.push({ ...record, id: i + 1 });
     }
 
