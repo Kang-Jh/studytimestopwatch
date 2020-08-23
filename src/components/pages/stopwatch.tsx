@@ -1,11 +1,11 @@
 import React, { useState, useLayoutEffect, useRef, useReducer } from 'react';
 import Modal from '../modal';
+import TimeDisplay from '../timeDisplay';
 import { Time, Day } from '../../@types/time';
 import { Record, PeriodRecord } from '../../@types/record';
 import {
   getNow,
   getDayAsKorean,
-  getDisplayTime,
   convertSecondsToTime,
   convertTimeToSeconds,
   convertMiliSecondsToSeconds,
@@ -292,9 +292,11 @@ export default function (props: any) {
             <h4 className="Stopwatch-sectionHeader">휴식중...</h4>
 
             <div className="Stopwatch-stopwatchDisplay">
-              {getDisplayTime(restTime.hours)}:
-              {getDisplayTime(restTime.minutes)}:
-              {getDisplayTime(restTime.seconds)}
+              <TimeDisplay
+                hours={restTime.hours}
+                minutes={restTime.minutes}
+                seconds={restTime.seconds}
+              />
             </div>
           </>
         ) : (
@@ -308,9 +310,11 @@ export default function (props: any) {
             )}
 
             <div className="Stopwatch-stopwatchDisplay">
-              {getDisplayTime(studyTime.hours)}:
-              {getDisplayTime(studyTime.minutes)}:
-              {getDisplayTime(studyTime.seconds)}
+              <TimeDisplay
+                hours={studyTime.hours}
+                minutes={studyTime.minutes}
+                seconds={studyTime.seconds}
+              />
             </div>
           </>
         )}
@@ -400,21 +404,21 @@ export default function (props: any) {
                   <td>{period}</td>
 
                   <td>
-                    <span>
-                      {getDisplayTime(netStudyTimeHours as number)}:
-                      {getDisplayTime(netStudyTimeMinutes as number)}:
-                      {getDisplayTime(netStudyTimeSeconds as number)}
-                    </span>
+                    <TimeDisplay
+                      hours={netStudyTimeHours as number}
+                      minutes={netStudyTimeMinutes as number}
+                      seconds={netStudyTimeSeconds as number}
+                    />
                   </td>
 
                   {/* restTime_hours가 undefined가 아니면 나머지 restTime들도 undefined가 아니므로 restTime_hours만 사용 */}
                   {restTimeHours !== undefined && (
                     <td>
-                      <span>
-                        {getDisplayTime(restTimeHours)}:
-                        {getDisplayTime(restTimeMinutes as number)}:
-                        {getDisplayTime(restTimeSeconds as number)}
-                      </span>
+                      <TimeDisplay
+                        hours={restTimeHours}
+                        minutes={restTimeMinutes as number}
+                        seconds={restTimeSeconds as number}
+                      />
                     </td>
                   )}
                 </tr>
@@ -429,9 +433,11 @@ export default function (props: any) {
                 record.totalStudyTime.minutes !== 0 ||
                 record.totalStudyTime.seconds !== 0) && (
                 <td>
-                  {getDisplayTime(record.totalStudyTime.hours)}:
-                  {getDisplayTime(record.totalStudyTime.minutes)}:
-                  {getDisplayTime(record.totalStudyTime.seconds)}
+                  <TimeDisplay
+                    hours={record.totalStudyTime.hours}
+                    minutes={record.totalStudyTime.minutes}
+                    seconds={record.totalStudyTime.seconds}
+                  />
                 </td>
               )}
               {/* 총 휴식시간이 0이 아닐 때만 총 휴식시간을 화면에 렌더링 */}
@@ -439,9 +445,11 @@ export default function (props: any) {
                 record.totalRestTime.minutes !== 0 ||
                 record.totalRestTime.seconds !== 0) && (
                 <td>
-                  {getDisplayTime(record.totalRestTime.hours)}:
-                  {getDisplayTime(record.totalRestTime.minutes)}:
-                  {getDisplayTime(record.totalRestTime.seconds)}
+                  <TimeDisplay
+                    hours={record.totalRestTime.hours}
+                    minutes={record.totalRestTime.minutes}
+                    seconds={record.totalRestTime.seconds}
+                  />
                 </td>
               )}
             </tr>
