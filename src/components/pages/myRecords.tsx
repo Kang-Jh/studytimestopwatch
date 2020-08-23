@@ -42,7 +42,7 @@ export default function (props: any): ReactElement {
       const record: Record = JSON.parse(
         localStorage.getItem(key) as string
       ) as Record;
-      records.push({ ...record, key });
+      records.push({ ...record, id: i });
     }
 
     setRecords(records);
@@ -88,7 +88,7 @@ export default function (props: any): ReactElement {
                       <div>
                         휴식시간 {convertTimeAsKorean(record.totalRestTime)}
                       </div>
-                      <Link to={`/myRecords/${record.key}`}>세부 기록</Link>
+                      <Link to={`/myRecords/${record.id}`}>세부 기록</Link>
                     </li>
                   ))}
               </ul>

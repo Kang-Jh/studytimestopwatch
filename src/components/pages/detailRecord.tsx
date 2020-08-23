@@ -4,15 +4,17 @@ import { Record } from '../../@types/record';
 import Statistic from '../statistic';
 
 export default function (props: any): ReactElement | null {
-  const { localStorageKey }: { localStorageKey: string } = useParams();
+  const { id }: { id: string } = useParams();
   const [record, setRecord] = useState<Record | null>(null);
 
   useEffect(() => {
+    const idAsNumber: number = Number(id);
+    const localStorageKey = localStorage.key(idAsNumber) as string;
     const record: Record = JSON.parse(
       localStorage.getItem(localStorageKey) as string
     ) as Record;
     setRecord(record);
-  }, [localStorageKey]);
+  }, [id]);
 
   if (record === null) {
     return null;

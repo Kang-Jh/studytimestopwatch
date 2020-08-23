@@ -11,7 +11,7 @@ function App(): ReactElement {
     <div className="App" aria-live="assertive">
       <Header />
       <Switch>
-        <Route exact path="/myRecords/:localStorageKey">
+        <Route exact path="/myRecords/:id">
           <DetailRecord />
         </Route>
 
