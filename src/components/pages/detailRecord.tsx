@@ -9,7 +9,8 @@ export default function (props: any): ReactElement | null {
 
   useEffect(() => {
     const idAsNumber: number = Number(id);
-    const localStorageKey = localStorage.key(idAsNumber) as string;
+    // id는 1부터 시작하지만 index는 0부터 시작하므로 idAsNumber - 1
+    const localStorageKey = localStorage.key(idAsNumber - 1) as string;
     const record: Record = JSON.parse(
       localStorage.getItem(localStorageKey) as string
     ) as Record;
