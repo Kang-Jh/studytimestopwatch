@@ -42,7 +42,7 @@ export default function (props: any): ReactElement {
       const record: Record = JSON.parse(
         localStorage.getItem(key) as string
       ) as Record;
-      records.push({ ...record, id: i });
+      records.push({ ...record, id: i + 1 });
     }
 
     setRecords(records);
