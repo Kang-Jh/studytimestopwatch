@@ -1,7 +1,8 @@
 import React, { useState, useEffect, ReactElement } from 'react';
+import Statistic from '../statistic';
+import StudyRecordTable from '../studyRecordTable';
 import { useParams } from 'react-router-dom';
 import { Record } from '../../@types/record';
-import Statistic from '../statistic';
 
 export default function (props: any): ReactElement | null {
   const { id }: { id: string } = useParams();
@@ -29,6 +30,8 @@ export default function (props: any): ReactElement | null {
         totalStudyTime={record.totalStudyTime}
         totalRestTime={record.totalRestTime}
       />
+
+      <StudyRecordTable record={record} />
     </div>
   );
 }
