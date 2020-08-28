@@ -1,5 +1,5 @@
 import React, { useState, useEffect, ReactElement } from 'react';
-import { Record } from '../../@types/record';
+import { StudyRecord } from '../../@types/studyRecord';
 import { Time } from '../../@types/time';
 import '../../styles/myRecords.css';
 import {
@@ -11,37 +11,43 @@ import { Link } from 'react-router-dom';
 import Statistic from '../statistic';
 
 export default function (props: any): ReactElement {
-  const [records, setRecords] = useState<Record[]>([]);
+  const [records, setRecords] = useState<StudyRecord[]>([]);
   const dates = [...new Set(records.map((record) => record.date))].sort();
   const totalPeriod: number = (records as any[]).reduce(
-    (prevTotalPeriod: number, record: Record): number => {
+    (prevTotalPeriod: number, record: StudyRecord): number => {
       return prevTotalPeriod + record.periodRecords.length;
     },
     0
   );
   const totalStudyTime: Time = convertSecondsToTime(
-    (records as any[]).reduce((timeAsSec: number, record: Record): number => {
-      return timeAsSec + convertTimeToSeconds(record.totalStudyTime);
-    }, 0)
+    (records as any[]).reduce(
+      (timeAsSec: number, record: StudyRecord): number => {
+        return timeAsSec + convertTimeToSeconds(record.totalStudyTime);
+      },
+      0
+    )
   );
   const totalRestTime: Time = convertSecondsToTime(
-    (records as any[]).reduce((timeAsSec: number, record: Record): number => {
-      return timeAsSec + convertTimeToSeconds(record.totalRestTime);
-    }, 0)
+    (records as any[]).reduce(
+      (timeAsSec: number, record: StudyRecord): number => {
+        return timeAsSec + convertTimeToSeconds(record.totalRestTime);
+      },
+      0
+    )
   );
 
   // effect to init states
   useEffect(() => {
-    let records: Record[] = [];
+    let records: StudyRecord[] = [];
     if (localStorage.length === 0) {
       return;
     }
 
     for (let i = 0; i < localStorage.length; i++) {
       const key: string = localStorage.key(i) as string;
-      const record: Record = JSON.parse(
+      const record: StudyRecord = JSON.parse(
         localStorage.getItem(key) as string
-      ) as Record;
+      ) as StudyRecord;
       // id is started from 1, not 0
       records.push({ ...record, id: i + 1 });
     }

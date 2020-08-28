@@ -3,7 +3,7 @@ import Modal from '../modal';
 import TimeDisplay from '../timeDisplay';
 import StudyRecordTable from '../studyRecordTable';
 import { Time, Day } from '../../@types/time';
-import { Record, PeriodRecord } from '../../@types/record';
+import { StudyRecord, PeriodRecord } from '../../@types/studyRecord';
 import {
   getNow,
   getDayAsKorean,
@@ -23,7 +23,7 @@ interface StopwatchActionParameter {
 // recordsReducer는 일시정지 버튼이 클릭될 때마다 클릭된 시간을 기록
 // 또는 리셋 버튼이 클릭될 경우 모든 기록을 삭제
 const recordReducer = (
-  state: Record,
+  state: StudyRecord,
   {
     type,
     hours = 0,
@@ -31,8 +31,8 @@ const recordReducer = (
     seconds = 0,
     heading = '',
   }: StopwatchActionParameter
-): Record => {
-  let newState: Record = { ...state };
+): StudyRecord => {
+  let newState: StudyRecord = { ...state };
   let lastPeriodRecord: PeriodRecord;
   let periodRecords: PeriodRecord[];
 

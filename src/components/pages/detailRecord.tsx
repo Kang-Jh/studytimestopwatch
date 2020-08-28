@@ -2,19 +2,19 @@ import React, { useState, useEffect, ReactElement } from 'react';
 import Statistic from '../statistic';
 import StudyRecordTable from '../studyRecordTable';
 import { useParams } from 'react-router-dom';
-import { Record } from '../../@types/record';
+import { StudyRecord } from '../../@types/studyRecord';
 
 export default function (props: any): ReactElement | null {
   const { id }: { id: string } = useParams();
-  const [record, setRecord] = useState<Record | null>(null);
+  const [record, setRecord] = useState<StudyRecord | null>(null);
 
   useEffect(() => {
     const idAsNumber: number = Number(id);
     // id는 1부터 시작하지만 index는 0부터 시작하므로 idAsNumber - 1
     const localStorageKey = localStorage.key(idAsNumber - 1) as string;
-    const record: Record = JSON.parse(
+    const record: StudyRecord = JSON.parse(
       localStorage.getItem(localStorageKey) as string
-    ) as Record;
+    ) as StudyRecord;
     setRecord(record);
   }, [id]);
 

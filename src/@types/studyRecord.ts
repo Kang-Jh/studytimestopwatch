@@ -1,6 +1,6 @@
 import { Time } from './time';
 
-export interface Record {
+export interface StudyRecord {
   id?: number;
   heading: string;
   date: string;
