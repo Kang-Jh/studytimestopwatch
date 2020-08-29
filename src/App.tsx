@@ -4,6 +4,7 @@ import Header from './components/header';
 import Stopwatch from './components/pages/stopwatch';
 import MyRecords from './components/pages/myRecords';
 import DetailRecord from './components/pages/detailRecord';
+import StatisticOfUsers from './components/pages/statisticOfUsers';
 import './App.css';
 
 function App(): ReactElement {
@@ -17,6 +18,10 @@ function App(): ReactElement {
 
         <Route exact path="/myRecords">
           <MyRecords />
+        </Route>
+
+        <Route exact path="/statisticOfUsers">
+          <StatisticOfUsers />
         </Route>
 
         <Route path="/">

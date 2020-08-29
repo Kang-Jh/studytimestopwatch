@@ -15,7 +15,7 @@ export default function (props: any): ReactElement {
           </li>
 
           <li>
-            <Link to="/statistic">전체 유저통계</Link>
+            <Link to="/statisticOfUsers">전체유저 통계</Link>
           </li>
         </ul>
       </nav>
