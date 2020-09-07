@@ -4,7 +4,7 @@ import {
   convertTimeAsKorean,
   convertSecondsToTime,
   convertTimeToSeconds,
-} from '../functions/time';
+} from '../utils/time';
 
 interface StatisticProps {
   heading?: string;

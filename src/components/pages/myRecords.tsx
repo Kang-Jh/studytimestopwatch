@@ -6,7 +6,7 @@ import {
   convertSecondsToTime,
   convertTimeToSeconds,
   convertTimeAsKorean,
-} from '../../functions/time';
+} from '../../utils/time';
 import { Link } from 'react-router-dom';
 import Statistic from '../statistic';
 
