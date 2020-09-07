@@ -1,5 +1,6 @@
 import React, { useState, useEffect, ReactElement } from 'react';
 import Statistic from '../statistic';
+import { getStatisticOfAllUsers } from '../../utils/fetchReocrds';
 import { Time } from '../../@types/time';
 
 export default function (): ReactElement {
@@ -16,21 +17,12 @@ export default function (): ReactElement {
   });
 
   useEffect(() => {
-    async function fetchStatOfUsers(): Promise<void> {
-      try {
-        const response = await fetch('http://localhost:4000/statisticOfUsers');
-        const result = await response.json();
-        const { totalPeriod, totalStudyTime, totalRestTime } = result;
-
-        setTotalPeriod(totalPeriod);
-        setTotalStudyTime(totalStudyTime);
-        setTotalRestTime(totalRestTime);
-      } catch (e) {
-        console.error(e);
-      }
-    }
-
-    fetchStatOfUsers();
+    getStatisticOfAllUsers().then((fetchResult) => {
+      const { totalPeriod, totalStudyTime, totalRestTime } = fetchResult;
+      setTotalPeriod(totalPeriod);
+      setTotalStudyTime(totalStudyTime);
+      setTotalRestTime(totalRestTime);
+    });
   }, []);
 
   return (
