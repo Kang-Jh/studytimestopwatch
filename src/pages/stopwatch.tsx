@@ -12,7 +12,7 @@ import {
   convertMiliSecondsToSeconds,
 } from '../utils/time';
 import { postStudyRecordsOfAllUsers } from '../utils/fetchReocrds';
-import '../../styles/stopwatch.css';
+import '../styles/stopwatch.css';
 
 interface StopwatchActionParameter {
   type: string;
