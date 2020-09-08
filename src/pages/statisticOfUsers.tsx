@@ -1,7 +1,7 @@
 import React, { useState, useEffect, ReactElement } from 'react';
-import Statistic from '../statistic';
-import { getStatisticOfAllUsers } from '../../utils/fetchReocrds';
-import { Time } from '../../@types/time';
+import Statistic from '../components/statistic';
+import { getStatisticOfAllUsers } from '../utils/fetchReocrds';
+import { Time } from '../@types/time';
 
 export default function (): ReactElement {
   const [totalPeriod, setTotalPeriod] = useState(0);

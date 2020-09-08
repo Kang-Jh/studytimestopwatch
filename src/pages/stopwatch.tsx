@@ -1,17 +1,17 @@
 import React, { useState, useLayoutEffect, useRef, useReducer } from 'react';
-import Modal from '../modal';
-import TimeDisplay from '../timeDisplay';
-import StudyRecordTable from '../studyRecordTable';
-import { Time, Day } from '../../@types/time';
-import { StudyRecord, PeriodRecord } from '../../@types/studyRecord';
+import Modal from '../components/modal';
+import TimeDisplay from '../components/timeDisplay';
+import StudyRecordTable from '../components/studyRecordTable';
+import { Time, Day } from '../@types/time';
+import { StudyRecord, PeriodRecord } from '../@types/studyRecord';
 import {
   getNow,
   getDayAsKorean,
   convertSecondsToTime,
   convertTimeToSeconds,
   convertMiliSecondsToSeconds,
-} from '../../utils/time';
-import { postStudyRecordsOfAllUsers } from '../../utils/fetchReocrds';
+} from '../utils/time';
+import { postStudyRecordsOfAllUsers } from '../utils/fetchReocrds';
 import '../../styles/stopwatch.css';
 
 interface StopwatchActionParameter {

@@ -1,8 +1,8 @@
 import React, { useState, useEffect, ReactElement } from 'react';
-import Statistic from '../statistic';
-import StudyRecordTable from '../studyRecordTable';
+import Statistic from '../components/statistic';
+import StudyRecordTable from '../components/studyRecordTable';
 import { useParams } from 'react-router-dom';
-import { StudyRecord } from '../../@types/studyRecord';
+import { StudyRecord } from '../@types/studyRecord';
 
 export default function (props: any): ReactElement | null {
   const { id }: { id: string } = useParams();

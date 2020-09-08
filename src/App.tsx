@@ -1,10 +1,10 @@
 import React, { ReactElement } from 'react';
 import { Route, Switch } from 'react-router-dom';
 import Header from './components/header';
-import Stopwatch from './components/pages/stopwatch';
-import MyRecords from './components/pages/myRecords';
-import DetailRecord from './components/pages/detailRecord';
-import StatisticOfUsers from './components/pages/statisticOfUsers';
+import Stopwatch from './pages/stopwatch';
+import MyRecords from './pages/myRecords';
+import DetailRecord from './pages/detailRecord';
+import StatisticOfUsers from './pages/statisticOfUsers';
 import './App.css';
 
 function App(): ReactElement {
