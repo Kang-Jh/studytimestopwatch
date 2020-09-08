@@ -26,11 +26,14 @@ export async function getStatisticOfAllUsers(): Promise<{
   totalRestTime: Time;
 }> {
   try {
-    const response = await fetch('http://localhost:4000/statisticOfAllUsers', {
-      headers: {
-        Accept: 'application/json',
-      },
-    });
+    const response = await fetch(
+      'http://localhost:4000/api/statisticOfAllUsers',
+      {
+        headers: {
+          Accept: 'application/json',
+        },
+      }
+    );
     const json = await response.json();
     const { totalPeriod, totalStudyTime, totalRestTime } = json;
 
