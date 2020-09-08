@@ -1,7 +1,7 @@
 import React, { useState, useEffect, ReactElement } from 'react';
 import { StudyRecord } from '../@types/studyRecord';
 import { Time } from '../@types/time';
-import '../../styles/myRecords.css';
+import '../styles/myRecords.css';
 import {
   convertSecondsToTime,
   convertTimeToSeconds,
