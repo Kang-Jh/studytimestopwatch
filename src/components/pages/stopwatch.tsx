@@ -10,7 +10,8 @@ import {
   convertSecondsToTime,
   convertTimeToSeconds,
   convertMiliSecondsToSeconds,
-} from '../../functions/time';
+} from '../../utils/time';
+import { postStudyRecordsOfAllUsers } from '../../utils/fetchReocrds';
 import '../../styles/stopwatch.css';
 
 interface StopwatchActionParameter {
@@ -445,6 +446,8 @@ export default function (props: any) {
               localStorage.setItem(key, JSON.stringify(record));
               localStorageKeyRef.current = key;
             }
+
+            postStudyRecordsOfAllUsers(record);
 
             setIsModalOpened(false);
             setRecord({ type: 'heading', heading: '' });

@@ -14,7 +14,6 @@ export async function postStudyRecordsOfAllUsers(record: StudyRecord) {
       }
     );
     const json = await response.json();
-
     return json;
   } catch (e) {
     console.error(e);
@@ -32,8 +31,8 @@ export async function getStatisticOfAllUsers(): Promise<{
         Accept: 'application/json',
       },
     });
-    const result = await response.json();
-    const { totalPeriod, totalStudyTime, totalRestTime } = result;
+    const json = await response.json();
+    const { totalPeriod, totalStudyTime, totalRestTime } = json;
 
     return {
       totalPeriod,
