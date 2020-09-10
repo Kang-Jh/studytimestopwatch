@@ -45,11 +45,11 @@ export default function (props: any): ReactElement {
 
     for (let i = 0; i < localStorage.length; i++) {
       const key: string = localStorage.key(i) as string;
-      const record: StudyRecord = JSON.parse(
+      const record = JSON.parse(
         localStorage.getItem(key) as string
       ) as StudyRecord;
       // id is started from 1, not 0
-      records.push({ ...record, id: i + 1 });
+      records.push(record);
     }
 
     setRecords(records);
@@ -85,8 +85,8 @@ export default function (props: any): ReactElement {
                 {/* 기록에서 같은 날짜인 것들만 필터링 해서 렌더링 */}
                 {records
                   .filter((record) => date === record.date)
-                  .map((record, index) => (
-                    <li key={index}>
+                  .map((record) => (
+                    <li key={record.localKey as number}>
                       <h3>{record.heading}</h3>
                       <div>{record.date}</div>
                       <div>
