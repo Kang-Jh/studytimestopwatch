@@ -19,12 +19,14 @@ export default function (): ReactElement {
   useEffect(() => {
     const abortController = new AbortController();
     const signal = abortController.signal;
-    getStatisticOfAllUsers(signal).then((fetchResult) => {
-      const { totalPeriod, totalStudyTime, totalRestTime } = fetchResult;
-      setTotalPeriod(totalPeriod);
-      setTotalStudyTime(totalStudyTime);
-      setTotalRestTime(totalRestTime);
-    });
+    getStatisticOfAllUsers(signal)
+      .then((fetchResult) => {
+        const { totalPeriod, totalStudyTime, totalRestTime } = fetchResult;
+        setTotalPeriod(totalPeriod);
+        setTotalStudyTime(totalStudyTime);
+        setTotalRestTime(totalRestTime);
+      })
+      .catch(console.error);
 
     return () => {
       abortController.abort();

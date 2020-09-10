@@ -27,39 +27,22 @@ export async function getStatisticOfAllUsers(
   totalStudyTime: Time;
   totalRestTime: Time;
 }> {
-  try {
-    const response = await fetch(
-      'http://localhost:4000/api/statisticOfAllUsers',
+  const response = await fetch(
+    'http://localhost:4000/api/statisticOfAllUsers',
 
-      {
-        signal,
-        headers: {
-          Accept: 'application/json',
-        },
-      }
-    );
-    const json = await response.json();
-    const { totalPeriod, totalStudyTime, totalRestTime } = json;
+    {
+      signal,
+      headers: {
+        Accept: 'application/json',
+      },
+    }
+  );
+  const json = await response.json();
+  const { totalPeriod, totalStudyTime, totalRestTime } = json;
 
-    return {
-      totalPeriod,
-      totalStudyTime,
-      totalRestTime,
-    };
-  } catch (e) {
-    console.error(e);
-    return {
-      totalPeriod: 0,
-      totalStudyTime: {
-        hours: 0,
-        minutes: 0,
-        seconds: 0,
-      },
-      totalRestTime: {
-        hours: 0,
-        minutes: 0,
-        seconds: 0,
-      },
-    };
-  }
+  return {
+    totalPeriod,
+    totalStudyTime,
+    totalRestTime,
+  };
 }
