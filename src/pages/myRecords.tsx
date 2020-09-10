@@ -86,7 +86,7 @@ export default function (props: any): ReactElement {
                 {records
                   .filter((record) => date === record.date)
                   .map((record) => (
-                    <li key={record.localKey as number}>
+                    <li key={(record.localKey as number).toString()}>
                       <h3>{record.heading}</h3>
                       <div>{record.date}</div>
                       <div>
