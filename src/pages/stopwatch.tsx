@@ -34,8 +34,8 @@ const recordReducer = (
   }: StopwatchActionParameter
 ): StudyRecord => {
   let newState: StudyRecord = { ...state };
-  let lastPeriodRecord: PeriodRecord;
-  let periodRecords: PeriodRecord[];
+  let lastPeriodRecord: Partial<PeriodRecord>;
+  let periodRecords: Partial<PeriodRecord>[];
 
   switch (type) {
     case 'reset':
@@ -434,7 +434,10 @@ export default function (props: any) {
               // 만약 스톱워치 사용중 저장한 적이 없으면
               // 로컬 스토리지에 저장된 아이템의 개수에 1을 더해서 키값으로 설정
               key = `${localStorage.length + 1}. ${record.heading}`;
-              localStorage.setItem(key, JSON.stringify(record));
+              localStorage.setItem(
+                key,
+                JSON.stringify({ ...record, localKey: localStorage.length + 1 })
+              );
               localStorageKeyRef.current = key;
             } else {
               // 스톱워치 사용중 저장한 적이 있으면
@@ -443,7 +446,10 @@ export default function (props: any) {
               // 다시 새 아이템을 로컬 스토리지에 저장할 것이므로
               key = `${localStorage.length}. ${record.heading}`;
               localStorage.removeItem(localStorageKeyRef.current);
-              localStorage.setItem(key, JSON.stringify(record));
+              localStorage.setItem(
+                key,
+                JSON.stringify({ ...record, localKey: localStorage.length })
+              );
               localStorageKeyRef.current = key;
             }
 
