@@ -17,12 +17,18 @@ export default function (): ReactElement {
   });
 
   useEffect(() => {
-    getStatisticOfAllUsers().then((fetchResult) => {
+    const abortController = new AbortController();
+    const signal = abortController.signal;
+    getStatisticOfAllUsers(signal).then((fetchResult) => {
       const { totalPeriod, totalStudyTime, totalRestTime } = fetchResult;
       setTotalPeriod(totalPeriod);
       setTotalStudyTime(totalStudyTime);
       setTotalRestTime(totalRestTime);
     });
+
+    return () => {
+      abortController.abort();
+    };
   }, []);
 
   return (

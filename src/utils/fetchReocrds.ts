@@ -20,7 +20,9 @@ export async function postStudyRecordsOfAllUsers(record: StudyRecord) {
   }
 }
 
-export async function getStatisticOfAllUsers(): Promise<{
+export async function getStatisticOfAllUsers(
+  signal: AbortSignal
+): Promise<{
   totalPeriod: number;
   totalStudyTime: Time;
   totalRestTime: Time;
@@ -28,7 +30,9 @@ export async function getStatisticOfAllUsers(): Promise<{
   try {
     const response = await fetch(
       'http://localhost:4000/api/statisticOfAllUsers',
+
       {
+        signal,
         headers: {
           Accept: 'application/json',
         },
