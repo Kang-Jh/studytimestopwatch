@@ -174,7 +174,9 @@ export default function (props: any) {
   const [isResumed, setIsResumed] = useState(false);
   const [record, setRecord] = useReducer(recordReducer, {
     heading: '',
-    date: `${new Date().getFullYear()}년 ${new Date().getMonth()}월 ${new Date().getDate()}일 ${getDayAsKorean(
+    date: `${new Date().getFullYear()}년 ${
+      new Date().getMonth() + 1
+    }월 ${new Date().getDate()}일 ${getDayAsKorean(
       new Date().getDay() as Day
     )}요일`,
     periodRecords: [],
