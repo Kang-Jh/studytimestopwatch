@@ -6,13 +6,16 @@ import {
   convertSecondsToTime,
   convertTimeToSeconds,
   convertTimeAsKorean,
+  getDateAsKorean,
 } from '../utils/time';
 import { Link } from 'react-router-dom';
 import Statistic from '../components/statistic';
 
 export default function (props: any): ReactElement {
   const [records, setRecords] = useState<StudyRecord[]>([]);
-  const dates = [...new Set(records.map((record) => record.date))].sort();
+  const dates = [
+    ...new Set(records.map((record) => getDateAsKorean(record.date))),
+  ].sort();
   const totalPeriod: number = (records as any[]).reduce(
     (prevTotalPeriod: number, record: StudyRecord): number => {
       return prevTotalPeriod + record.periodRecords.length;
@@ -48,6 +51,7 @@ export default function (props: any): ReactElement {
       const record = JSON.parse(
         localStorage.getItem(key) as string
       ) as StudyRecord;
+      record.date = new Date(record.date);
       // id is started from 1, not 0
       records.push(record);
     }
@@ -79,17 +83,16 @@ export default function (props: any): ReactElement {
         <ol>
           {/* 날짜를 기준으로 기록을 분류 */}
           {dates.map((date) => (
-            // 모든 저장된 기록들은 시간값이 다르기 때문에 key로 사용할 수 있음
-            <li key={date.getMilliseconds()}>
-              {date}
+            <li key={date}>
+              <span>{date}</span>
               <ul>
                 {/* 기록에서 같은 날짜인 것들만 필터링 해서 렌더링 */}
                 {records
-                  .filter((record) => date === record.date)
+                  .filter((record) => date === getDateAsKorean(record.date))
                   .map((record) => (
                     <li key={(record.localKey as number).toString()}>
                       <h3>{record.heading}</h3>
-                      <div>{record.date}</div>
+                      <div>{getDateAsKorean(record.date)}</div>
                       <div>
                         공부시간 {convertTimeAsKorean(record.totalStudyTime)}
                       </div>
