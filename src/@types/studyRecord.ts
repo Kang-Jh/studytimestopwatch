@@ -4,7 +4,7 @@ export interface StudyRecord {
   id?: string;
   localKey?: number;
   heading: string;
-  date: string;
+  date: Date;
   periodRecords: Partial<PeriodRecord>[];
   totalStudyTime: Time;
   totalRestTime: Time;
