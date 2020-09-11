@@ -3,6 +3,7 @@ import Statistic from '../components/statistic';
 import StudyRecordTable from '../components/studyRecordTable';
 import { useParams } from 'react-router-dom';
 import { StudyRecord } from '../@types/studyRecord';
+import { getDateAsKorean } from '../utils/time';
 
 export default function (props: any): ReactElement | null {
   const { id }: { id: string } = useParams();
@@ -24,6 +25,8 @@ export default function (props: any): ReactElement | null {
 
   return (
     <div>
+      <span>{getDateAsKorean(record.date)}</span>
+
       <Statistic
         heading="통계"
         totalPeriod={record.periodRecords.length}
