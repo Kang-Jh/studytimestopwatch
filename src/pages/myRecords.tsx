@@ -79,7 +79,8 @@ export default function (props: any): ReactElement {
         <ol>
           {/* 날짜를 기준으로 기록을 분류 */}
           {dates.map((date) => (
-            <li key={date}>
+            // 모든 저장된 기록들은 시간값이 다르기 때문에 key로 사용할 수 있음
+            <li key={date.getMilliseconds()}>
               {date}
               <ul>
                 {/* 기록에서 같은 날짜인 것들만 필터링 해서 렌더링 */}
