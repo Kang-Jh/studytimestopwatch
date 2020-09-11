@@ -2,11 +2,10 @@ import React, { useState, useLayoutEffect, useRef, useReducer } from 'react';
 import Modal from '../components/modal';
 import TimeDisplay from '../components/timeDisplay';
 import StudyRecordTable from '../components/studyRecordTable';
-import { Time, Day } from '../@types/time';
+import { Time } from '../@types/time';
 import { StudyRecord, PeriodRecord } from '../@types/studyRecord';
 import {
   getNow,
-  getDayAsKorean,
   convertSecondsToTime,
   convertTimeToSeconds,
   convertMiliSecondsToSeconds,
@@ -40,7 +39,7 @@ const recordReducer = (
   switch (type) {
     case 'reset':
       return {
-        date: state.date,
+        date: new Date(),
         periodRecords: [],
         heading: '',
         totalStudyTime: {
@@ -174,11 +173,7 @@ export default function (props: any) {
   const [isResumed, setIsResumed] = useState(false);
   const [record, setRecord] = useReducer(recordReducer, {
     heading: '',
-    date: `${new Date().getFullYear()}년 ${
-      new Date().getMonth() + 1
-    }월 ${new Date().getDate()}일 ${getDayAsKorean(
-      new Date().getDay() as Day
-    )}요일`,
+    date: new Date(),
     periodRecords: [],
     totalStudyTime: {
       hours: 0,
