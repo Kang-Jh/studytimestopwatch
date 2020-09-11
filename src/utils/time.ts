@@ -1,4 +1,4 @@
-import { Time, TimeObject, Day } from '../@types/time';
+import { Time, TimeObject } from '../@types/time';
 
 // performance가 존재하지 않으면 Date로 대체
 export const timeObject: TimeObject =
@@ -40,7 +40,7 @@ export const convertTimeAsKorean = (time: Time): string => {
  * @param {Day} number - Day as a number. 0 represent Sunday, 6 Represent Saturday
  * @return {string} Present a day as a Korean word
  */
-export const getDayAsKorean = (number: Day): string => {
+export const getDayAsKorean = (number: number): string => {
   if (number === 0) {
     return '일';
   }
@@ -71,3 +71,14 @@ export const getDayAsKorean = (number: Day): string => {
 
   throw new Error('올바른 인자가 아닙니다');
 };
+
+/**
+ * return Korean date format string from date object
+ * @param date {Date}
+ * @return {string}
+ */
+export function getDateAsKorean(date: Date): string {
+  return `${date.getFullYear()}년 ${
+    date.getMonth() + 1
+  }월 ${date.getDate()}일 ${getDayAsKorean(date.getDay())}요일`;
+}
