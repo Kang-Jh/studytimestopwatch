@@ -13,21 +13,3 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
-
-main {
-  padding: 50px;
-  margin: 50px;
-}
-
-.textAlign-right {
-  text-align: right;
-}
-
-.srOnly {
-  position: absolute !important;
-  overflow: hidden;
-  width: 1px;
-  height: 1px;
-  clip: rect(1px 1px 1px 1px);
-  clip: rect(1px, 1px, 1px, 1px);
-}

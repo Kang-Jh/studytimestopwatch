@@ -1,3 +1,39 @@
 .App {
+  display: grid;
+  grid-template-rows: 10fr 2fr;
   text-align: center;
+}
+
+main {
+  grid-row: 1;
+  margin-top: 80px;
+  padding-top: 50px;
+}
+
+footer {
+  grid-row: 2;
+}
+
+.textAlign-right {
+  text-align: right;
+}
+
+.srOnly {
+  position: absolute !important;
+  border: 0;
+  top: 0;
+  left: 0;
+  overflow: hidden;
+  width: 1px;
+  height: 1px;
+  clip: rect(1px 1px 1px 1px);
+  clip: rect(1px, 1px, 1px, 1px);
+}
+
+.primary {
+  background-color: #00ffff;
+}
+
+.button {
+  border: 0;
 }

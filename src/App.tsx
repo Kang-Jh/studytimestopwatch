@@ -1,6 +1,6 @@
 import React, { ReactElement } from 'react';
 import { Route, Switch } from 'react-router-dom';
-import Header from './components/header';
+import HeaderAndNav from './components/HeaderAndNav/HeaderAndNav';
 import Stopwatch from './pages/stopwatch';
 import MyRecords from './pages/myRecords';
 import DetailRecord from './pages/detailRecord';
@@ -10,7 +10,7 @@ import './App.css';
 function App(): ReactElement {
   return (
     <div className="App" aria-live="assertive">
-      <Header />
+      <HeaderAndNav />
       <Switch>
         <Route exact path="/myRecords/:id">
           <DetailRecord />

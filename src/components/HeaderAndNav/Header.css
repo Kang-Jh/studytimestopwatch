@@ -1,0 +1,15 @@
+.Header {
+  position: fixed;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  height: 80px;
+  top: 0;
+  left: 0;
+  width: 100%;
+}
+
+.Header-menuDiv {
+  margin-left: 10px;
+  padding-left: 10px;
+}
