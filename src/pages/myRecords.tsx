@@ -60,7 +60,7 @@ export default function (props: any): ReactElement {
   }, []);
 
   return (
-    <main className="MyRecords">
+    <div className="MyRecords">
       <div>
         <button
           onClick={() => {
@@ -107,6 +107,6 @@ export default function (props: any): ReactElement {
           ))}
         </ol>
       </div>
-    </main>
+    </div>
   );
 }
