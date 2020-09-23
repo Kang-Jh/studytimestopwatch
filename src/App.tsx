@@ -1,4 +1,4 @@
-import React, { ReactElement } from 'react';
+import React, { useState, ReactElement } from 'react';
 import { Route, Switch } from 'react-router-dom';
 import HeaderAndNav from './components/HeaderAndNav/HeaderAndNav';
 import Stopwatch from './pages/stopwatch';
@@ -8,26 +8,40 @@ import StatisticOfUsers from './pages/statisticOfUsers';
 import './App.css';
 
 function App(): ReactElement {
+  const [isMenuOpened, setIsMenuOpened] = useState(false);
+
+  const onMenuClicked = () => {
+    setIsMenuOpened((state) => !state);
+  };
+
   return (
     <div className="App" aria-live="assertive">
-      <HeaderAndNav />
-      <Switch>
-        <Route exact path="/myRecords/:id">
-          <DetailRecord />
-        </Route>
+      <HeaderAndNav isMenuOpened={isMenuOpened} onMenuClicked={onMenuClicked} />
+      <main
+        onClick={() => {
+          if (window.innerWidth < 600) {
+            setIsMenuOpened(false);
+          }
+        }}
+      >
+        <Switch>
+          <Route exact path="/myRecords/:id">
+            <DetailRecord />
+          </Route>
 
-        <Route exact path="/myRecords">
-          <MyRecords />
-        </Route>
+          <Route exact path="/myRecords">
+            <MyRecords />
+          </Route>
 
-        <Route exact path="/statisticOfUsers">
-          <StatisticOfUsers />
-        </Route>
+          <Route exact path="/statisticOfUsers">
+            <StatisticOfUsers />
+          </Route>
 
-        <Route path="/">
-          <Stopwatch />
-        </Route>
-      </Switch>
+          <Route path="/">
+            <Stopwatch />
+          </Route>
+        </Switch>
+      </main>
     </div>
   );
 }
