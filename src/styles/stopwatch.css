@@ -1,11 +1,10 @@
-.Stopwatch-sectionHeader {
-  font-size: 40px;
-  margin: 0;
+.Stopwatch-stopwatch {
+  font-size: calc(4rem + 5vw);
 }
 
-/* display that is displaying time */
-.Stopwatch-stopwatchDisplay {
-  font-size: 150px;
+.Stopwatch-stopwatch h4 {
+  font-size: calc(1rem + 3vw);
+  margin: 0;
 }
 
 /* record section */
