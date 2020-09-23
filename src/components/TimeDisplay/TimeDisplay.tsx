@@ -1,5 +1,5 @@
 import React, { ReactElement } from 'react';
-import { Time } from '../@types/time';
+import { Time } from '../../@types/time';
 
 // 입력값이 10보다 작으면 앞에 0을 붙인 문자열을 return
 // 입력값이 10 이상이면 입력값을 그대로 return
