@@ -1,16 +1,16 @@
-import React, { ReactElement } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 import './Header.css';
 import './Nav.css';
 import menuIcon from './images/menu-icon.svg';
 import { OnClick } from '../../@types/AppEvent';
 
-function Header({ onClick }: { onClick: OnClick }) {
+export function Header({ onMenuClicked }: { onMenuClicked: OnClick }) {
   return (
     <header role="banner" className="Header primary">
       <h1 className="srOnly">공부용 스톱워치 애플리케이션</h1>
       <div className="Header-menuDiv">
-        <button className="button primary" onClick={onClick}>
+        <button className="button primary" onClick={onMenuClicked}>
           <img
             className="Header-menuImage"
             src={menuIcon}
@@ -22,18 +22,18 @@ function Header({ onClick }: { onClick: OnClick }) {
   );
 }
 
-function Nav({
+export function Nav({
   isMenuOpened,
-  onClick,
+  onMenuClicked,
 }: {
   isMenuOpened: boolean;
-  onClick: OnClick;
+  onMenuClicked: OnClick;
 }) {
   return (
     <div className={`NavWrapper ${isMenuOpened ? '' : 'srOnly'}`}>
       <div className="Nav-menuDivCover primary">
         <div className="Nav-dummyDiv">
-          <button className="button primary" onClick={onClick}>
+          <button className="button primary" onClick={onMenuClicked}>
             <img src={menuIcon} alt="메뉴 닫기 버튼" />
           </button>
         </div>
@@ -60,20 +60,5 @@ function Nav({
         </ul>
       </nav>
     </div>
-  );
-}
-
-export default function HeaderAndNav({
-  isMenuOpened,
-  onMenuClicked,
-}: {
-  isMenuOpened: boolean;
-  onMenuClicked: OnClick;
-}): ReactElement {
-  return (
-    <>
-      <Header onClick={onMenuClicked} />
-      <Nav isMenuOpened={isMenuOpened} onClick={onMenuClicked} />
-    </>
   );
 }
