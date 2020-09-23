@@ -1,5 +1,5 @@
 import React, { ReactElement } from 'react';
-import TimeDisplay from './timeDisplay';
+import TimeDisplay from './TimeDisplay/TimeDisplay';
 import { StudyRecord } from '../@types/studyRecord';
 
 export default function ({ record }: { record: StudyRecord }): ReactElement {
