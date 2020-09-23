@@ -1,10 +1,9 @@
-import React, { useState, ReactElement } from 'react';
+import React, { ReactElement } from 'react';
 import { Link } from 'react-router-dom';
 import './Header.css';
 import './Nav.css';
 import menuIcon from './images/menu-icon.svg';
-
-type OnClick = () => void;
+import { OnClick } from '../../@types/AppEvent';
 
 function Header({ onClick }: { onClick: OnClick }) {
   return (
@@ -64,17 +63,17 @@ function Nav({
   );
 }
 
-export default function HeaderAndNav(props: any): ReactElement {
-  const [isMenuOpened, setIsMenuOpened] = useState(false);
-
-  const onClicked = () => {
-    setIsMenuOpened((state) => !state);
-  };
-
+export default function HeaderAndNav({
+  isMenuOpened,
+  onMenuClicked,
+}: {
+  isMenuOpened: boolean;
+  onMenuClicked: OnClick;
+}): ReactElement {
   return (
     <>
-      <Header onClick={onClicked} />
-      <Nav isMenuOpened={isMenuOpened} onClick={onClicked} />
+      <Header onClick={onMenuClicked} />
+      <Nav isMenuOpened={isMenuOpened} onClick={onMenuClicked} />
     </>
   );
 }
