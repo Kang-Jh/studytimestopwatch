@@ -1,6 +1,6 @@
 import React, { useState, useLayoutEffect, useRef, useReducer } from 'react';
 import Modal from '../components/modal';
-import TimeDisplay from '../components/timeDisplay';
+import TimeDisplay from '../components/TimeDisplay/TimeDisplay';
 import StudyRecordTable from '../components/studyRecordTable';
 import { Time } from '../@types/time';
 import { StudyRecord, PeriodRecord } from '../@types/studyRecord';
@@ -281,42 +281,40 @@ export default function (props: any) {
   }, [isStarted, isResumed]);
 
   return (
-    <main className="Stopwatch">
+    <div className="Stopwatch">
       <h2 className="srOnly">스톱워치 및 공부기록</h2>
 
       <article>
         <h3 className="srOnly">스톱워치</h3>
-        {isStarted && !isResumed ? (
-          <>
-            <h4 className="Stopwatch-sectionHeader">휴식중...</h4>
+        <div className="Stopwatch-stopwatch">
+          {isStarted && !isResumed ? (
+            <>
+              <h4>휴식중...</h4>
 
-            <div className="Stopwatch-stopwatchDisplay">
               <TimeDisplay
                 hours={restTime.hours}
                 minutes={restTime.minutes}
                 seconds={restTime.seconds}
               />
-            </div>
-          </>
-        ) : (
-          <>
-            {/* 초기 상태 또는 리셋 상태일 경우 스크린 리더들에게만 보이는 헤딩을 보여줌 */}
-            {/* 공부하기가 클릭된 경우 공부중... 이라는 헤딩을 보여줌  */}
-            {isStarted ? (
-              <h4 className="Stopwatch-sectionHeader">공부중...</h4>
-            ) : (
-              <h4 className="srOnly">스톱워치 디스플레이</h4>
-            )}
+            </>
+          ) : (
+            <>
+              {/* 초기 상태 또는 리셋 상태일 경우 스크린 리더들에게만 보이는 헤딩을 보여줌 */}
+              {/* 공부하기가 클릭된 경우 공부중... 이라는 헤딩을 보여줌  */}
+              {isStarted ? (
+                <h4>공부중...</h4>
+              ) : (
+                <h4 className="srOnly">스톱워치 디스플레이</h4>
+              )}
 
-            <div className="Stopwatch-stopwatchDisplay">
               <TimeDisplay
                 hours={studyTime.hours}
                 minutes={studyTime.minutes}
                 seconds={studyTime.seconds}
               />
-            </div>
-          </>
-        )}
+            </>
+          )}
+        </div>
 
         <div>
           {/* 타이머가 한 번이라도 측정되었거나 기록이 저장되었으면 리셋 버튼을 표시 */}
@@ -484,6 +482,6 @@ export default function (props: any) {
           </div>
         </form>
       </Modal>
-    </main>
+    </div>
   );
 }
