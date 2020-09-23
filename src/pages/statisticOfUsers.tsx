@@ -1,9 +1,9 @@
-import React, { useState, useEffect, ReactElement } from 'react';
+import React, { useState, useEffect } from 'react';
 import Statistic from '../components/statistic';
 import { getStatisticOfAllUsers } from '../utils/fetchReocrds';
 import { Time } from '../@types/time';
 
-export default function (): ReactElement {
+export default function () {
   const [totalPeriod, setTotalPeriod] = useState(0);
   const [totalStudyTime, setTotalStudyTime] = useState<Time>({
     hours: 0,

@@ -1,4 +1,4 @@
-import React, { ReactElement } from 'react';
+import React from 'react';
 import { Time } from '../@types/time';
 import {
   convertTimeAsKorean,
@@ -18,7 +18,7 @@ export default function ({
   totalPeriod,
   totalStudyTime,
   totalRestTime,
-}: StatisticProps): ReactElement {
+}: StatisticProps) {
   let initialAverageTime: Time = { hours: 0, minutes: 0, seconds: 0 };
   let averageStudyTime: Time;
   let averageRestTime: Time;

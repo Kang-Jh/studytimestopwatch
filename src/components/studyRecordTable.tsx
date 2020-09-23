@@ -1,8 +1,8 @@
-import React, { ReactElement } from 'react';
+import React from 'react';
 import TimeDisplay from './TimeDisplay/TimeDisplay';
 import { StudyRecord } from '../@types/studyRecord';
 
-export default function ({ record }: { record: StudyRecord }): ReactElement {
+export default function ({ record }: { record: StudyRecord }) {
   return (
     <>
       <h3 className="srOnly">공부기록</h3>

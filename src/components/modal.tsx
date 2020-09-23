@@ -1,4 +1,4 @@
-import { useRef, useEffect, ReactElement, ReactPortal } from 'react';
+import { useRef, useEffect, ReactElement } from 'react';
 import ReactDOM from 'react-dom';
 import '../styles/modal.css';
 
@@ -12,7 +12,7 @@ export default function ({
 }: {
   isOpened: boolean;
   children: ReactElement;
-}): ReactPortal | null {
+}) {
   const containerRef = useRef(document.createElement('div'));
 
   useEffect(() => {

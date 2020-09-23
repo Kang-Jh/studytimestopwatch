@@ -1,4 +1,4 @@
-import React, { ReactElement } from 'react';
+import React from 'react';
 import { Time } from '../../@types/time';
 
 // 입력값이 10보다 작으면 앞에 0을 붙인 문자열을 return
@@ -9,7 +9,7 @@ function getDisplayTime(number: number): string {
   return number < 10 ? `0${number}` : `${number}`;
 }
 
-export default function ({ hours, minutes, seconds }: Time): ReactElement {
+export default function ({ hours, minutes, seconds }: Time) {
   return (
     <span>
       {getDisplayTime(hours)}:{getDisplayTime(minutes)}:

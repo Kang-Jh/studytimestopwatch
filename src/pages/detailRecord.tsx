@@ -1,11 +1,11 @@
-import React, { useState, useEffect, ReactElement } from 'react';
+import React, { useState, useEffect } from 'react';
 import Statistic from '../components/statistic';
 import StudyRecordTable from '../components/studyRecordTable';
 import { useParams } from 'react-router-dom';
 import { StudyRecord } from '../@types/studyRecord';
 import { getDateAsKorean } from '../utils/time';
 
-export default function (props: any): ReactElement | null {
+export default function (props: any) {
   const { id }: { id: string } = useParams();
   const [record, setRecord] = useState<StudyRecord | null>(null);
 

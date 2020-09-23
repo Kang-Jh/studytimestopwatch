@@ -1,4 +1,4 @@
-import React, { useState, useEffect, ReactElement } from 'react';
+import React, { useState, useEffect } from 'react';
 import { StudyRecord } from '../@types/studyRecord';
 import { Time } from '../@types/time';
 import '../styles/myRecords.css';
@@ -11,7 +11,7 @@ import {
 import { Link } from 'react-router-dom';
 import Statistic from '../components/statistic';
 
-export default function (props: any): ReactElement {
+export default function (props: any) {
   const [records, setRecords] = useState<StudyRecord[]>([]);
   const dates = [
     ...new Set(records.map((record) => getDateAsKorean(record.date))),
