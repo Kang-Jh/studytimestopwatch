@@ -1,5 +1,5 @@
 .NavWrapper {
-  z-index: 1;
+  position: relative;
   grid-row: 1;
 }
 
@@ -7,6 +7,15 @@
   position: relative;
   margin-top: 80px;
   height: calc(100% - 80px);
+}
+
+@media screen and (max-width: 599px) {
+  .Nav {
+    width: 200px;
+    background-color: white;
+    position: absolute;
+    z-index: 2;
+  }
 }
 
 .Nav ul {
