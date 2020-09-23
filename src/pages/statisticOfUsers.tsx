@@ -34,13 +34,13 @@ export default function (): ReactElement {
   }, []);
 
   return (
-    <main className="StatsticOfUsers">
+    <div className="StatsticOfUsers">
       <Statistic
         heading="전체유저 통계"
         totalPeriod={totalPeriod}
         totalStudyTime={totalStudyTime}
         totalRestTime={totalRestTime}
       />
-    </main>
+    </div>
   );
 }
