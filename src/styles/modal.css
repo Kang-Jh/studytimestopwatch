@@ -1,5 +1,8 @@
-#modalRoot.open {
+#modalRoot {
   position: fixed;
+}
+
+#modalRoot.open {
   z-index: 999;
   left: 0;
   top: 0;
@@ -11,8 +14,11 @@
 }
 
 .Modal {
-  margin: 10% auto;
   width: 50%;
   height: auto;
   background-color: #fefefe;
+}
+
+#modalRoot.open .Modal {
+  margin: 10% auto;
 }

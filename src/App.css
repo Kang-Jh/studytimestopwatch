@@ -1,17 +1,38 @@
 .App {
   display: grid;
-  grid-template-rows: 10fr 2fr;
+  grid-template-rows: 80px 1fr 80px;
   text-align: center;
+  row-gap: 30px;
+}
+
+.App-menuOpened {
+  grid-template-columns: 200px 1fr;
+}
+
+@media screen and (max-width: 599px) {
+  .App-menuOpened {
+    grid-template-columns: 1fr;
+  }
+}
+
+header {
+  grid-row: 1;
+}
+
+nav {
+  grid-row: 2;
 }
 
 main {
-  grid-row: 1;
-  margin-top: 80px;
-  padding-top: 50px;
+  grid-row: 2;
+}
+
+main.test {
+  grid-column: 2;
 }
 
 footer {
-  grid-row: 2;
+  grid-row: 3;
 }
 
 .textAlign-right {

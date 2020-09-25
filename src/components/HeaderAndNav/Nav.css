@@ -1,20 +1,15 @@
-.NavWrapper {
-  position: relative;
-  grid-row: 1;
-}
-
 .Nav {
   position: relative;
-  margin-top: 80px;
-  height: calc(100% - 80px);
 }
 
 @media screen and (max-width: 599px) {
   .Nav {
+    top: 110px;
     width: 200px;
+    height: calc(100% - 80px);
     background-color: white;
     position: absolute;
-    z-index: 2;
+    z-index: 1;
   }
 }
 
@@ -29,6 +24,10 @@
   padding: 0px;
   list-style: none;
   width: 100%;
+}
+
+.Nav.srOnly ul {
+  top: 0px;
 }
 
 .Nav li {
