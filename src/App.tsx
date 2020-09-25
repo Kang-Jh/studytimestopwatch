@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Route, Switch } from 'react-router-dom';
 import { Header, Nav } from './components/HeaderAndNav/HeaderAndNav';
-import Stopwatch from './pages/stopwatch';
-import MyRecords from './pages/myRecords';
-import DetailRecord from './pages/detailRecord';
-import StatisticOfUsers from './pages/statisticOfUsers';
+import Stopwatch from './pages/Stopwatch/Stopwatch';
+import MyRecords from './pages/MyRecord/MyRecords';
+import DetailRecord from './pages/DetailRecord/DetailRecord';
+import StatisticOfUsers from './pages/StatisticOfUsers/StatisticOfUsers';
 import './App.css';
 
 function App() {
@@ -76,7 +76,16 @@ function App() {
           </Route>
         </Switch>
       </main>
-      <footer>test</footer>
+
+      <footer
+        onClick={() => {
+          if (window.innerWidth < 600) {
+            setIsMenuOpened(false);
+          }
+        }}
+      >
+        test
+      </footer>
     </div>
   );
 }

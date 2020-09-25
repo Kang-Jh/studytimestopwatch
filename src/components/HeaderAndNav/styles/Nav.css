@@ -4,12 +4,12 @@
 
 @media screen and (max-width: 599px) {
   .Nav {
-    top: 110px;
-    width: 200px;
-    height: calc(100% - 80px);
-    background-color: white;
     position: absolute;
+    top: 80px;
     z-index: 1;
+    width: 200px;
+    height: calc(100vh - 80px);
+    background-color: white;
   }
 }
 

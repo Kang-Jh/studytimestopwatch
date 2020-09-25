@@ -1,17 +1,17 @@
 import React, { useState, useLayoutEffect, useRef, useReducer } from 'react';
-import Modal from '../components/modal';
-import TimeDisplay from '../components/TimeDisplay/TimeDisplay';
-import StudyRecordTable from '../components/studyRecordTable';
-import { Time } from '../@types/time';
-import { StudyRecord, PeriodRecord } from '../@types/studyRecord';
+import Modal from '../../components/Modal/Modal';
+import TimeDisplay from '../../components/TimeDisplay/TimeDisplay';
+import StudyRecordTable from '../../components/StudyRecordTable/StudyRecordTable';
+import { Time } from '../../@types/time';
+import { StudyRecord, PeriodRecord } from '../../@types/studyRecord';
 import {
   getNow,
   convertSecondsToTime,
   convertTimeToSeconds,
   convertMiliSecondsToSeconds,
-} from '../utils/time';
-import { postStudyRecordsOfAllUsers } from '../utils/fetchReocrds';
-import '../styles/stopwatch.css';
+} from '../../utils/time';
+import { postStudyRecordsOfAllUsers } from '../../utils/fetchReocrds';
+import './Stopwatch.css';
 
 interface StopwatchActionParameter {
   type: string;
@@ -284,7 +284,7 @@ export default function (props: any) {
     <div className="Stopwatch">
       <h2 className="srOnly">스톱워치 및 공부기록</h2>
 
-      <article>
+      <section>
         <h3 className="srOnly">스톱워치</h3>
         <div className="Stopwatch-stopwatch">
           {isStarted && !isResumed ? (
@@ -320,7 +320,7 @@ export default function (props: any) {
           {/* 타이머가 한 번이라도 측정되었거나 기록이 저장되었으면 리셋 버튼을 표시 */}
           {(isStarted || localStorageKeyRef.current) && (
             <button
-              className="Stopwatch-button Stopwatch-background-white"
+              className="button Stopwatch-button"
               type="button"
               onClick={() => {
                 localStorageKeyRef.current = '';
@@ -337,7 +337,7 @@ export default function (props: any) {
 
           {isResumed ? (
             <button
-              className="Stopwatch-button Stopwatch-background-blue"
+              className="button primary color-white Stopwatch-button"
               type="button"
               onClick={() => {
                 setIsResumed(false);
@@ -354,7 +354,7 @@ export default function (props: any) {
             </button>
           ) : (
             <button
-              className="Stopwatch-button Stopwatch-background-blue"
+              className="button primary color-white Stopwatch-button"
               type="button"
               onClick={() => {
                 setIsStarted(true);
@@ -372,16 +372,14 @@ export default function (props: any) {
             </button>
           )}
         </div>
-      </article>
+      </section>
 
-      <div className="Stopwatch-studyRecords-section">
-        <StudyRecordTable record={record} />
-
+      <section className="Stopwatch-studyRecords-section">
         <div className="textAlign-right">
           {/* 저장하기 버튼은 저장하기 modal을 여는 역할을 함 */}
           {/* 실제로 저장하는 것이 아님 */}
           <button
-            className="Stopwatch-button"
+            className="button primary"
             onClick={() => {
               // 한 번이라도 스톱워치가 공부시간을 측정하지 않은 경우
               if (record.periodRecords.length === 0 && !isStarted) {
@@ -417,7 +415,9 @@ export default function (props: any) {
             저장하기
           </button>
         </div>
-      </div>
+
+        <StudyRecordTable record={record} />
+      </section>
 
       <Modal isOpened={isModalOpened}>
         <form

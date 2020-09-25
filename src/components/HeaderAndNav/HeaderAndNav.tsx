@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import './Header.css';
-import './Nav.css';
+import './styles/Header.css';
+import './styles/Nav.css';
 import menuIcon from './images/menu-icon.svg';
 import { OnClick } from '../../@types/AppEvent';
 
