@@ -1,13 +1,14 @@
 import React from 'react';
 import TimeDisplay from '../TimeDisplay/TimeDisplay';
 import { StudyRecord } from '../../@types/studyRecord';
+import './StudyRecordTable.css';
 
 export default function ({ record }: { record: StudyRecord }) {
   return (
-    <>
-      <h3 className="srOnly">공부기록</h3>
+    <div>
       <table className="StudyRecordTable-table">
-        <thead>
+        <caption className="srOnly">교시당 공부시간 및 휴식시간</caption>
+        <thead className="srOnly">
           <tr>
             <th scope="col">교시</th>
             <th scope="col">공부시간</th>
@@ -54,7 +55,16 @@ export default function ({ record }: { record: StudyRecord }) {
 
         <tfoot>
           <tr>
-            <th scope="row">총합</th>
+            <th scope="row" className="srOnly">
+              총합
+            </th>
+
+            <td>
+              {record.periodRecords.length === 0
+                ? null
+                : record.periodRecords.length}
+            </td>
+
             {(record.totalStudyTime.hours !== 0 ||
               record.totalStudyTime.minutes !== 0 ||
               record.totalStudyTime.seconds !== 0) && (
@@ -81,6 +91,6 @@ export default function ({ record }: { record: StudyRecord }) {
           </tr>
         </tfoot>
       </table>
-    </>
+    </div>
   );
 }
