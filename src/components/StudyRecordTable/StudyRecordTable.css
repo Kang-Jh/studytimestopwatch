@@ -1,0 +1,8 @@
+.StudyRecordTable-table {
+  table-layout: fixed;
+  font-size: 2rem;
+  display: flex;
+  flex-direction: column-reverse;
+  justify-content: center;
+  align-items: center;
+}
