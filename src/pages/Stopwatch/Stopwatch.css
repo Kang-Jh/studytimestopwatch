@@ -7,11 +7,16 @@
   margin: 0;
 }
 
+/* button */
+.Stopwatch-button {
+  margin: 20px 10px;
+  padding: 10px;
+}
+
 /* record section */
 .Stopwatch-studyRecords-section {
   width: 50%;
-  margin: auto;
-  margin-top: 100px;
+  margin: 50px auto 0;
 }
 
 /* form and its elements */
@@ -28,38 +33,4 @@
 
 .Stopwatch-saveRecordsForm-inputDiv {
   padding: 150px 0;
-}
-
-/* button */
-.Stopwatch-button {
-  margin: 20px 10px;
-  padding: 10px;
-}
-
-/* background color */
-.Stopwatch-background-blue {
-  color: #fefefe;
-  background-color: #008fff;
-}
-
-.Stopwatch-background-white {
-  color: #070707;
-  background-color: #fefefe;
-}
-
-/* table */
-.Stopwatch-table {
-  table-layout: fixed;
-  width: 100%;
-}
-
-/* setting head cell width of thead of table */
-/* which is different from othe */
-.Stopwatch-table thead th:nth-child(1) {
-  width: 10%;
-}
-
-.Stopwatch-table thead th:nth-child(2),
-.Stopwatch-table thead th:nth-child(3) {
-  width: 45%;
 }
