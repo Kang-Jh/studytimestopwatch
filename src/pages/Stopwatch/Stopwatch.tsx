@@ -375,6 +375,7 @@ export default function (props: any) {
       </section>
 
       <section className="Stopwatch-studyRecords-section">
+        <h3 className="srOnly">공부기록</h3>
         <div className="textAlign-right">
           {/* 저장하기 버튼은 저장하기 modal을 여는 역할을 함 */}
           {/* 실제로 저장하는 것이 아님 */}
