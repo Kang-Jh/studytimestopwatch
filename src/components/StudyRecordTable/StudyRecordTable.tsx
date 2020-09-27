@@ -20,9 +20,9 @@ export default function ({ record }: { record: StudyRecord }) {
           {record.periodRecords.map(
             ({
               period,
-              netStudyTimeHours,
-              netStudyTimeMinutes,
-              netStudyTimeSeconds,
+              studyTimeHours,
+              studyTimeMinutes,
+              studyTimeSeconds,
               restTimeHours,
               restTimeMinutes,
               restTimeSeconds,
@@ -32,9 +32,9 @@ export default function ({ record }: { record: StudyRecord }) {
 
                 <td>
                   <TimeDisplay
-                    hours={netStudyTimeHours as number}
-                    minutes={netStudyTimeMinutes as number}
-                    seconds={netStudyTimeSeconds as number}
+                    hours={studyTimeHours as number}
+                    minutes={studyTimeMinutes as number}
+                    seconds={studyTimeSeconds as number}
                   />
                 </td>
 
@@ -52,44 +52,6 @@ export default function ({ record }: { record: StudyRecord }) {
             )
           )}
         </tbody>
-
-        <tfoot>
-          <tr>
-            <th scope="row" className="srOnly">
-              총합
-            </th>
-
-            <td>
-              {record.periodRecords.length === 0
-                ? null
-                : record.periodRecords.length}
-            </td>
-
-            {(record.totalStudyTime.hours !== 0 ||
-              record.totalStudyTime.minutes !== 0 ||
-              record.totalStudyTime.seconds !== 0) && (
-              <td>
-                <TimeDisplay
-                  hours={record.totalStudyTime.hours}
-                  minutes={record.totalStudyTime.minutes}
-                  seconds={record.totalStudyTime.seconds}
-                />
-              </td>
-            )}
-            {/* 총 휴식시간이 0이 아닐 때만 총 휴식시간을 화면에 렌더링 */}
-            {(record.totalRestTime.hours !== 0 ||
-              record.totalRestTime.minutes !== 0 ||
-              record.totalRestTime.seconds !== 0) && (
-              <td>
-                <TimeDisplay
-                  hours={record.totalRestTime.hours}
-                  minutes={record.totalRestTime.minutes}
-                  seconds={record.totalRestTime.seconds}
-                />
-              </td>
-            )}
-          </tr>
-        </tfoot>
       </table>
     </div>
   );
