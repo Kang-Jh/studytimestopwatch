@@ -12,9 +12,9 @@ export interface StudyRecord {
 
 export interface PeriodRecord {
   period: number;
-  netStudyTimeHours: number;
-  netStudyTimeMinutes: number;
-  netStudyTimeSeconds: number;
+  studyTimeHours: number;
+  studyTimeMinutes: number;
+  studyTimeSeconds: number;
   restTimeHours: number;
   restTimeMinutes: number;
   restTimeSeconds: number;
