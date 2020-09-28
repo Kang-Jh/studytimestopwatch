@@ -1,7 +1,6 @@
 import React from 'react';
-import TimeDisplay from '../TimeDisplay/TimeDisplay';
-import { StudyRecord } from '../../@types/studyRecord';
-import './StudyRecordTable.css';
+import TimeDisplay from './TimeDisplay';
+import { StudyRecord } from '../@types/studyRecord';
 
 export default function ({ record }: { record: StudyRecord }) {
   return (

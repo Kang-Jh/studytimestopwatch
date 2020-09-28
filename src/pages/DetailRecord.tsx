@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import Statistic from '../../components/Statistic/Statistic';
-import StudyRecordTable from '../../components/StudyRecordTable/StudyRecordTable';
+import Statistic from '../components/Statistic';
+import StudyRecordTable from '../components/StudyRecordTable';
 import { useParams } from 'react-router-dom';
-import { StudyRecord } from '../../@types/studyRecord';
-import { getDateAsKorean } from '../../utils/time';
+import { StudyRecord } from '../@types/studyRecord';
+import { getDateAsKorean } from '../utils/time';
 
 export default function (props: any) {
   const { id }: { id: string } = useParams();

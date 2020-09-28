@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Route, Switch } from 'react-router-dom';
-import { Header, Nav } from './components/HeaderAndNav/HeaderAndNav';
-import Stopwatch from './pages/Stopwatch/Stopwatch';
-import MyRecords from './pages/MyRecord/MyRecords';
-import DetailRecord from './pages/DetailRecord/DetailRecord';
-import StatisticOfUsers from './pages/StatisticOfUsers/StatisticOfUsers';
-import './App.css';
+import { Header, Nav } from './components/HeaderAndNav';
+import Stopwatch from './pages/Stopwatch';
+import MyRecords from './pages/MyRecords';
+import DetailRecord from './pages/DetailRecord';
+import StatisticOfUsers from './pages/StatisticOfUsers';
+import CssBaseline from '@material-ui/core/CssBaseline';
+import Container from '@material-ui/core/Container';
+import Grid from '@material-ui/core/Grid';
 
 function App() {
   const [isMenuOpened, setIsMenuOpened] = useState(
@@ -45,47 +47,59 @@ function App() {
   }, []);
 
   return (
-    <div
-      className={`App ${isMenuOpened ? 'App-menuOpened' : ''}`}
-      aria-live="assertive"
-    >
-      <Header onMenuClicked={onMenuClicked} showMenuButton={isMediumWidth} />
-      <Nav isMenuOpened={isMenuOpened} />
-      <main
-        onClick={() => {
-          if (window.innerWidth < 600) {
-            setIsMenuOpened(false);
-          }
-        }}
-      >
-        <Switch>
-          <Route exact path="/myRecords/:id">
-            <DetailRecord />
-          </Route>
+    <div className="App" aria-live="assertive">
+      <CssBaseline />
+      <Container fixed>
+        <Grid container>
+          <Grid item xs={12}>
+            <Header
+              onMenuClicked={onMenuClicked}
+              showMenuButton={isMediumWidth}
+            />
+          </Grid>
 
-          <Route exact path="/myRecords">
-            <MyRecords />
-          </Route>
+          <Grid item xs={12}>
+            <Nav isMenuOpened={isMenuOpened} />
+            <main
+              onClick={() => {
+                if (window.innerWidth < 600) {
+                  setIsMenuOpened(false);
+                }
+              }}
+            >
+              <Switch>
+                <Route exact path="/myRecords/:id">
+                  <DetailRecord />
+                </Route>
 
-          <Route exact path="/statisticOfUsers">
-            <StatisticOfUsers />
-          </Route>
+                <Route exact path="/myRecords">
+                  <MyRecords />
+                </Route>
 
-          <Route path="/">
-            <Stopwatch />
-          </Route>
-        </Switch>
-      </main>
+                <Route exact path="/statisticOfUsers">
+                  <StatisticOfUsers />
+                </Route>
 
-      <footer
-        onClick={() => {
-          if (window.innerWidth < 600) {
-            setIsMenuOpened(false);
-          }
-        }}
-      >
-        test
-      </footer>
+                <Route path="/">
+                  <Stopwatch />
+                </Route>
+              </Switch>
+            </main>
+          </Grid>
+
+          <Grid item xs={12}>
+            <footer
+              onClick={() => {
+                if (window.innerWidth < 600) {
+                  setIsMenuOpened(false);
+                }
+              }}
+            >
+              test
+            </footer>
+          </Grid>
+        </Grid>
+      </Container>
     </div>
   );
 }

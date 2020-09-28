@@ -1,9 +1,8 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import './styles/Header.css';
-import './styles/Nav.css';
-import menuIcon from './images/menu-icon.svg';
-import { OnClick } from '../../@types/AppEvent';
+import { OnClick } from '../@types/AppEvent';
+import AppBar from '@material-ui/core/AppBar';
+import Typography from '@material-ui/core/Typography';
 
 export function Header({
   onMenuClicked,
@@ -13,14 +12,14 @@ export function Header({
   showMenuButton: boolean;
 }) {
   return (
-    <header role="banner" className="Header primary">
-      <h1 className="srOnly">공부용 스톱워치 애플리케이션</h1>
+    <AppBar role="banner" component="header">
+      <Typography component="h1">스톱워치</Typography>
       <div className={`${showMenuButton ? 'Header-menuDiv' : 'srOnly'}`}>
         <button className="button primary" onClick={onMenuClicked}>
-          <img className="Header-menuImage" src={menuIcon} alt="메뉴 버튼" />
+          <img className="Header-menuImage" src="" alt="메뉴 버튼" />
         </button>
       </div>
-    </header>
+    </AppBar>
   );
 }
 

@@ -1,10 +1,10 @@
 import React from 'react';
-import { Time } from '../../@types/time';
+import { Time } from '../@types/time';
 import {
   convertTimeAsKorean,
   convertSecondsToTime,
   convertTimeToSeconds,
-} from '../../utils/time';
+} from '../utils/time';
 
 interface StatisticProps {
   heading?: string;

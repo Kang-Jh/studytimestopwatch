@@ -1,17 +1,16 @@
 import React, { useState, useLayoutEffect, useRef, useReducer } from 'react';
-import Modal from '../../components/Modal/Modal';
-import TimeDisplay from '../../components/TimeDisplay/TimeDisplay';
-import StudyRecordTable from '../../components/StudyRecordTable/StudyRecordTable';
-import { Time } from '../../@types/time';
-import { StudyRecord, PeriodRecord } from '../../@types/studyRecord';
+import Modal from '../components/Modal';
+import TimeDisplay from '../components/TimeDisplay';
+import StudyRecordTable from '../components/StudyRecordTable';
+import { Time } from '../@types/time';
+import { StudyRecord, PeriodRecord } from '../@types/studyRecord';
 import {
   getNow,
   convertSecondsToTime,
   convertTimeToSeconds,
   convertMiliSecondsToSeconds,
-} from '../../utils/time';
-import { postStudyRecordsOfAllUsers } from '../../utils/fetchReocrds';
-import './Stopwatch.css';
+} from '../utils/time';
+import { postStudyRecordsOfAllUsers } from '../utils/fetchReocrds';
 
 interface StopwatchActionParameter {
   type: string;
@@ -118,8 +117,10 @@ const recordReducer = (
 };
 
 export default function (props: any) {
+  const localStorageKeyRef = useRef('');
   const totalRunningTimeRef = useRef(0);
   const totalRestTimeRef = useRef(0);
+
   const [totalStudyTime, setTotalStudyTime] = useState<Time>({
     hours: 0,
     minutes: 0,
@@ -148,7 +149,22 @@ export default function (props: any) {
     },
   });
   const [isModalOpened, setIsModalOpened] = useState(false);
-  const localStorageKeyRef = useRef('');
+  const [showTotalStudyTime, setShowTotalStudyTime] = useState(true);
+
+  const currentStudyTime =
+    !isStarted && !isResumed
+      ? totalStudyTime
+      : convertSecondsToTime(
+          convertTimeToSeconds(totalStudyTime) -
+            convertMiliSecondsToSeconds(totalRunningTimeRef.current)
+        );
+  const currentRestTime =
+    !isStarted && !isResumed
+      ? totalRestTime
+      : convertSecondsToTime(
+          convertTimeToSeconds(totalRestTime) -
+            convertMiliSecondsToSeconds(totalRestTimeRef.current)
+        );
 
   // 리셋 이펙트
   useLayoutEffect(() => {
@@ -264,36 +280,69 @@ export default function (props: any) {
 
       <section>
         <h3 className="srOnly">스톱워치</h3>
+        <div className="Stopwatch-ToggleButtonContainer textAlign-right">
+          <button
+            className="Stopwatch-button primary button color-white"
+            onClick={() => setShowTotalStudyTime((state) => !state)}
+          >
+            {showTotalStudyTime ? '이번교시' : '누적시간'}
+          </button>
+        </div>
+
         <div className="Stopwatch-stopwatch">
           {isStarted && !isResumed ? (
             <>
-              <h4>휴식중...</h4>
+              <h4>
+                {showTotalStudyTime ? '누적 휴식시간' : '이번교시 휴식시간'}
+              </h4>
 
-              <div>
-                <TimeDisplay
-                  hours={totalRestTime.hours}
-                  minutes={totalRestTime.minutes}
-                  seconds={totalRestTime.seconds}
-                />
-              </div>
+              {showTotalStudyTime ? (
+                <div className="Stopwatch-totalTime">
+                  <TimeDisplay
+                    hours={totalRestTime.hours}
+                    minutes={totalRestTime.minutes}
+                    seconds={totalRestTime.seconds}
+                  />
+                </div>
+              ) : (
+                <div className="Stopwatch-currentTime">
+                  <TimeDisplay
+                    hours={currentRestTime.hours}
+                    minutes={currentRestTime.minutes}
+                    seconds={currentRestTime.seconds}
+                  />
+                </div>
+              )}
             </>
           ) : (
             <>
               {/* 초기 상태 또는 리셋 상태일 경우 스크린 리더들에게만 보이는 헤딩을 보여줌 */}
               {/* 공부하기가 클릭된 경우 공부중... 이라는 헤딩을 보여줌  */}
               {isStarted ? (
-                <h4>공부중...</h4>
+                <h4>
+                  {showTotalStudyTime ? '누적 공부시간' : '이번교시 공부시간'}
+                </h4>
               ) : (
                 <h4 className="srOnly">스톱워치 디스플레이</h4>
               )}
 
-              <div>
-                <TimeDisplay
-                  hours={totalStudyTime.hours}
-                  minutes={totalStudyTime.minutes}
-                  seconds={totalStudyTime.seconds}
-                />
-              </div>
+              {showTotalStudyTime ? (
+                <div className="Stopwatch-totalTime">
+                  <TimeDisplay
+                    hours={totalStudyTime.hours}
+                    minutes={totalStudyTime.minutes}
+                    seconds={totalStudyTime.seconds}
+                  />
+                </div>
+              ) : (
+                <div className="Stopwatch-currentTime">
+                  <TimeDisplay
+                    hours={currentStudyTime.hours}
+                    minutes={currentStudyTime.minutes}
+                    seconds={currentStudyTime.seconds}
+                  />
+                </div>
+              )}
             </>
           )}
         </div>

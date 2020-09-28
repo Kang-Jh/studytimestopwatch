@@ -1,15 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { StudyRecord } from '../../@types/studyRecord';
-import { Time } from '../../@types/time';
+import { StudyRecord } from '../@types/studyRecord';
+import { Time } from '../@types/time';
 import {
   convertSecondsToTime,
   convertTimeToSeconds,
   convertTimeAsKorean,
   getDateAsKorean,
-} from '../../utils/time';
+} from '../utils/time';
 import { Link } from 'react-router-dom';
-import Statistic from '../../components/Statistic/Statistic';
-import './MyRecords.css';
+import Statistic from '../components/Statistic';
 
 export default function (props: any) {
   const [records, setRecords] = useState<StudyRecord[]>([]);
