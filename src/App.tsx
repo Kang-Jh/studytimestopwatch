@@ -1,72 +1,35 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Route, Switch } from 'react-router-dom';
-import { Header, Nav } from './components/HeaderAndNav';
+import { Header } from './components/HeaderAndNav';
 import Stopwatch from './pages/Stopwatch';
 import MyRecords from './pages/MyRecords';
 import DetailRecord from './pages/DetailRecord';
 import StatisticOfUsers from './pages/StatisticOfUsers';
-import CssBaseline from '@material-ui/core/CssBaseline';
-import Container from '@material-ui/core/Container';
-import Grid from '@material-ui/core/Grid';
+import { CssBaseline, Container, makeStyles, Toolbar } from '@material-ui/core';
+
+const useStyles = makeStyles((theme) => ({
+  root: {
+    display: 'flex',
+  },
+  content: {
+    flexGrow: 1,
+    padding: theme.spacing(3),
+  },
+}));
 
 function App() {
-  const [isMenuOpened, setIsMenuOpened] = useState(
-    window.innerWidth < 960 ? false : true
-  );
-  const [isMediumWidth, setIsMediumWidth] = useState(
-    window.innerWidth < 960 ? true : false
-  );
-
-  const onMenuClicked = () => {
-    setIsMenuOpened((state) => !state);
-  };
-
-  // resize effect
-  useEffect(() => {
-    let rAF: number;
-    function resizeHandler() {
-      cancelAnimationFrame(rAF);
-
-      rAF = requestAnimationFrame(() => {
-        if (window.innerWidth < 960) {
-          setIsMediumWidth(true);
-          setIsMenuOpened(false);
-        } else {
-          setIsMediumWidth(false);
-          setIsMenuOpened(true);
-        }
-      });
-    }
-
-    window.addEventListener('resize', resizeHandler);
-
-    return () => {
-      cancelAnimationFrame(rAF);
-      window.removeEventListener('resize', resizeHandler);
-    };
-  }, []);
+  const classes = useStyles();
 
   return (
     <div className="App" aria-live="assertive">
       <CssBaseline />
-      <Container fixed>
-        <Grid container>
-          <Grid item xs={12}>
-            <Header
-              onMenuClicked={onMenuClicked}
-              showMenuButton={isMediumWidth}
-            />
-          </Grid>
+      <div className={classes.root}>
+        <Header />
 
-          <Grid item xs={12}>
-            <Nav isMenuOpened={isMenuOpened} />
-            <main
-              onClick={() => {
-                if (window.innerWidth < 600) {
-                  setIsMenuOpened(false);
-                }
-              }}
-            >
+        <div className={classes.content}>
+          <Toolbar />
+          <main>
+            <Container>
               <Switch>
                 <Route exact path="/myRecords/:id">
                   <DetailRecord />
@@ -84,22 +47,12 @@ function App() {
                   <Stopwatch />
                 </Route>
               </Switch>
-            </main>
-          </Grid>
+            </Container>
+          </main>
 
-          <Grid item xs={12}>
-            <footer
-              onClick={() => {
-                if (window.innerWidth < 600) {
-                  setIsMenuOpened(false);
-                }
-              }}
-            >
-              test
-            </footer>
-          </Grid>
-        </Grid>
-      </Container>
+          <footer>test</footer>
+        </div>
+      </div>
     </div>
   );
 }
