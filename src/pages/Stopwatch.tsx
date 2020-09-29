@@ -12,12 +12,15 @@ import {
 } from '../utils/time';
 import { postStudyRecordsOfAllUsers } from '../utils/fetchReocrds';
 
+import { Button, Switch, Typography } from '@material-ui/core';
+
 interface StopwatchActionParameter {
   type: string;
   totalStudyTime: Time;
   totalRestTime: Time;
   heading: string;
 }
+
 // recordsReducer는 일시정지 버튼이 클릭될 때마다 클릭된 시간을 기록
 // 또는 리셋 버튼이 클릭될 경우 모든 기록을 삭제
 const recordReducer = (
@@ -149,7 +152,7 @@ export default function (props: any) {
     },
   });
   const [isModalOpened, setIsModalOpened] = useState(false);
-  const [showTotalStudyTime, setShowTotalStudyTime] = useState(true);
+  const [showTotalTime, setShowTotalTime] = useState(true);
 
   const currentStudyTime =
     !isStarted && !isResumed
@@ -166,10 +169,32 @@ export default function (props: any) {
             convertMiliSecondsToSeconds(totalRestTimeRef.current)
         );
 
+  const displayedStudyTimeHeading = !isStarted
+    ? '스톱워치 초기상태 또는 정지상태'
+    : showTotalTime
+    ? '누적 공부시간'
+    : '이번교시 공부시간';
+  const displayedRestTimeHeading = showTotalTime
+    ? '누적 휴식시간'
+    : '이번교시 휴식시간';
+  const displayedHeading =
+    isStarted && !isResumed
+      ? displayedRestTimeHeading
+      : displayedStudyTimeHeading;
+
+  const displayedStudyTime = showTotalTime ? totalStudyTime : currentStudyTime;
+  const displayedRestTime = showTotalTime ? totalRestTime : currentRestTime;
+  const displayedTime = isResumed ? displayedStudyTime : displayedRestTime;
+
+  const displayedLabel = isStarted
+    ? isResumed
+      ? '공부중...'
+      : '휴식중...'
+    : null;
+
   // 리셋 이펙트
   useLayoutEffect(() => {
     if (!isStarted && !isResumed) {
-      localStorageKeyRef.current = '';
       totalRestTimeRef.current = 0;
       totalRunningTimeRef.current = 0;
     }
@@ -275,85 +300,49 @@ export default function (props: any) {
   }, [isStarted, isResumed]);
 
   return (
-    <div className="Stopwatch">
-      <h2 className="srOnly">스톱워치 및 공부기록</h2>
+    <div>
+      <Typography variant="srOnly" component="h2">
+        스톱워치 및 공부기록
+      </Typography>
 
       <section>
-        <h3 className="srOnly">스톱워치</h3>
-        <div className="Stopwatch-ToggleButtonContainer textAlign-right">
-          <button
-            className="Stopwatch-button primary button color-white"
-            onClick={() => setShowTotalStudyTime((state) => !state)}
+        <Typography variant="srOnly" component="h3">
+          스톱워치 디스플레이
+        </Typography>
+
+        {/* TODO 버튼에서 스위치로 바꾸기 */}
+        <div>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => setShowTotalTime((state) => !state)}
           >
-            {showTotalStudyTime ? '이번교시' : '누적시간'}
-          </button>
+            {showTotalTime ? '이번교시' : '누적시간'}
+          </Button>
         </div>
 
-        <div className="Stopwatch-stopwatch">
-          {isStarted && !isResumed ? (
-            <>
-              <h4>
-                {showTotalStudyTime ? '누적 휴식시간' : '이번교시 휴식시간'}
-              </h4>
+        <div>
+          <Typography variant="srOnly" component="h4">
+            {displayedHeading}
+          </Typography>
 
-              {showTotalStudyTime ? (
-                <div className="Stopwatch-totalTime">
-                  <TimeDisplay
-                    hours={totalRestTime.hours}
-                    minutes={totalRestTime.minutes}
-                    seconds={totalRestTime.seconds}
-                  />
-                </div>
-              ) : (
-                <div className="Stopwatch-currentTime">
-                  <TimeDisplay
-                    hours={currentRestTime.hours}
-                    minutes={currentRestTime.minutes}
-                    seconds={currentRestTime.seconds}
-                  />
-                </div>
-              )}
-            </>
-          ) : (
-            <>
-              {/* 초기 상태 또는 리셋 상태일 경우 스크린 리더들에게만 보이는 헤딩을 보여줌 */}
-              {/* 공부하기가 클릭된 경우 공부중... 이라는 헤딩을 보여줌  */}
-              {isStarted ? (
-                <h4>
-                  {showTotalStudyTime ? '누적 공부시간' : '이번교시 공부시간'}
-                </h4>
-              ) : (
-                <h4 className="srOnly">스톱워치 디스플레이</h4>
-              )}
-
-              {showTotalStudyTime ? (
-                <div className="Stopwatch-totalTime">
-                  <TimeDisplay
-                    hours={totalStudyTime.hours}
-                    minutes={totalStudyTime.minutes}
-                    seconds={totalStudyTime.seconds}
-                  />
-                </div>
-              ) : (
-                <div className="Stopwatch-currentTime">
-                  <TimeDisplay
-                    hours={currentStudyTime.hours}
-                    minutes={currentStudyTime.minutes}
-                    seconds={currentStudyTime.seconds}
-                  />
-                </div>
-              )}
-            </>
-          )}
+          <div>
+            <Typography>{displayedLabel}</Typography>
+            <TimeDisplay
+              hours={displayedTime.hours}
+              minutes={displayedTime.minutes}
+              seconds={displayedTime.seconds}
+            />
+          </div>
         </div>
 
         <div>
           {/* 타이머가 한 번이라도 측정되었거나 기록이 저장되었으면 리셋 버튼을 표시 */}
           {(isStarted || localStorageKeyRef.current) && (
             <button
-              className="button Stopwatch-button"
               type="button"
               onClick={() => {
+                localStorageKeyRef.current = '';
                 setTotalStudyTime({ hours: 0, minutes: 0, seconds: 0 });
                 setTotalRestTime({ hours: 0, minutes: 0, seconds: 0 });
                 setIsStarted(false);
@@ -367,7 +356,6 @@ export default function (props: any) {
 
           {isResumed ? (
             <button
-              className="button primary color-white Stopwatch-button"
               type="button"
               onClick={() => {
                 setIsResumed(false);
@@ -381,7 +369,6 @@ export default function (props: any) {
             </button>
           ) : (
             <button
-              className="button primary color-white Stopwatch-button"
               type="button"
               onClick={() => {
                 setIsStarted(true);
@@ -399,13 +386,12 @@ export default function (props: any) {
         </div>
       </section>
 
-      <section className="Stopwatch-studyRecords-section">
-        <h3 className="srOnly">공부기록</h3>
-        <div className="Stopwatch-studyRecords-saveBtn textAlign-right">
+      <section>
+        <h3>공부기록</h3>
+        <div>
           {/* 저장하기 버튼은 저장하기 modal을 여는 역할을 함 */}
           {/* 실제로 저장하는 것이 아님 */}
           <button
-            className="button primary"
             onClick={() => {
               // 한 번이라도 스톱워치가 공부시간을 측정하지 않은 경우
               if (record.periodRecords.length === 0 && !isStarted) {
@@ -443,7 +429,6 @@ export default function (props: any) {
 
       <Modal isOpened={isModalOpened}>
         <form
-          className="Stopwatch-saveRecordsForm"
           onSubmit={(e) => {
             e.preventDefault();
             let key: string;
@@ -478,7 +463,7 @@ export default function (props: any) {
         >
           <h3>공부기록 저장</h3>
 
-          <div className="Stopwatch-saveRecordsForm-inputDiv">
+          <div>
             <label htmlFor="heading">제목</label>
             <input
               type="text"
@@ -490,7 +475,7 @@ export default function (props: any) {
             />
           </div>
 
-          <div className="Stopwatch-saveRecordsForm-buttonDiv">
+          <div>
             <button type="submit">저장</button>
             <button
               type="button"
