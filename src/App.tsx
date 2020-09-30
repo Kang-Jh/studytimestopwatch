@@ -10,10 +10,20 @@ import { CssBaseline, Container, makeStyles, Toolbar } from '@material-ui/core';
 const useStyles = makeStyles((theme) => ({
   root: {
     display: 'flex',
+    minHeight: '100vh',
   },
   content: {
+    display: 'flex',
+    flexDirection: 'column',
     flexGrow: 1,
     padding: theme.spacing(3),
+  },
+  main: {
+    marginBottom: theme.spacing(2),
+  },
+  footer: {
+    padding: theme.spacing(3, 2),
+    marginTop: 'auto',
   },
 }));
 
@@ -28,29 +38,27 @@ function App() {
 
         <div className={classes.content}>
           <Toolbar />
-          <main>
-            <Container>
-              <Switch>
-                <Route exact path="/myRecords/:id">
-                  <DetailRecord />
-                </Route>
+          <Container component="main" className={classes.main}>
+            <Switch>
+              <Route exact path="/myRecords/:id">
+                <DetailRecord />
+              </Route>
 
-                <Route exact path="/myRecords">
-                  <MyRecords />
-                </Route>
+              <Route exact path="/myRecords">
+                <MyRecords />
+              </Route>
 
-                <Route exact path="/statisticOfUsers">
-                  <StatisticOfUsers />
-                </Route>
+              <Route exact path="/statisticOfUsers">
+                <StatisticOfUsers />
+              </Route>
 
-                <Route path="/">
-                  <Stopwatch />
-                </Route>
-              </Switch>
-            </Container>
-          </main>
+              <Route path="/">
+                <Stopwatch />
+              </Route>
+            </Switch>
+          </Container>
 
-          <footer>test</footer>
+          <footer className={classes.footer}>test</footer>
         </div>
       </div>
     </div>
