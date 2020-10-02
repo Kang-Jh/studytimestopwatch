@@ -1,5 +1,4 @@
 import React, { useState, useLayoutEffect, useRef, useReducer } from 'react';
-import Modal from '../components/Modal';
 import TimeDisplay from '../components/TimeDisplay';
 import StudyRecordTable from '../components/StudyRecordTable';
 import { Time } from '../@types/time';
@@ -12,7 +11,18 @@ import {
 } from '../utils/time';
 import { postStudyRecordsOfAllUsers } from '../utils/fetchReocrds';
 
-import { Button, Switch, Typography } from '@material-ui/core';
+import {
+  Button,
+  Switch,
+  Typography,
+  Grid,
+  Dialog,
+  TextField,
+  makeStyles,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+} from '@material-ui/core';
 
 interface StopwatchActionParameter {
   type: string;
@@ -20,6 +30,30 @@ interface StopwatchActionParameter {
   totalRestTime: Time;
   heading: string;
 }
+
+const useStyles = makeStyles((theme) => ({
+  textCenter: {
+    textAlign: 'center',
+  },
+  textRight: {
+    textAlign: 'right',
+  },
+  timeDisplay: {
+    marginBottom: theme.spacing(10),
+  },
+  switch: {
+    marginBottom: theme.spacing(5),
+  },
+  displayedLabel: {
+    fontSize: `calc(2rem + 1vw)`,
+  },
+  displayedTime: {
+    fontSize: `calc(2.5rem + 5vw)`,
+  },
+  buttonGap: {
+    margin: theme.spacing(0, 1),
+  },
+}));
 
 // recordsReducer는 일시정지 버튼이 클릭될 때마다 클릭된 시간을 기록
 // 또는 리셋 버튼이 클릭될 경우 모든 기록을 삭제
@@ -120,6 +154,7 @@ const recordReducer = (
 };
 
 export default function (props: any) {
+  const classes = useStyles();
   const localStorageKeyRef = useRef('');
   const totalRunningTimeRef = useRef(0);
   const totalRestTimeRef = useRef(0);
@@ -151,8 +186,8 @@ export default function (props: any) {
       seconds: 0,
     },
   });
-  const [isModalOpened, setIsModalOpened] = useState(false);
-  const [showTotalTime, setShowTotalTime] = useState(true);
+  const [openSaveDialog, setOpenSaveDialog] = useState(false);
+  const [showTotalTime, setShowTotalTime] = useState(false);
 
   const currentStudyTime =
     !isStarted && !isResumed
@@ -300,47 +335,78 @@ export default function (props: any) {
   }, [isStarted, isResumed]);
 
   return (
-    <div>
+    <Grid container justify="center" alignItems="center">
       <Typography variant="srOnly" component="h2">
         스톱워치 및 공부기록
       </Typography>
 
-      <section>
+      {/* 스톱워치 디스플레이 아티클 */}
+      <Grid item component="article" xs={12} className={classes.timeDisplay}>
         <Typography variant="srOnly" component="h3">
           스톱워치 디스플레이
         </Typography>
 
-        {/* TODO 버튼에서 스위치로 바꾸기 */}
-        <div>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={() => setShowTotalTime((state) => !state)}
+        {/* 스톱워치 디스플레이 상태 스위치 */}
+        <Typography component="div" className={classes.switch}>
+          <Grid
+            component="label"
+            container
+            alignItems="center"
+            justify="flex-end"
+            spacing={1}
           >
-            {showTotalTime ? '이번교시' : '누적시간'}
-          </Button>
-        </div>
+            <Grid item>이번교시</Grid>
+            <Grid item>
+              <Switch
+                checked={showTotalTime}
+                onChange={() => {
+                  setShowTotalTime((state) => !state);
+                }}
+                inputProps={{ 'aria-label': 'Display state checkbox' }}
+                color="primary"
+              />
+            </Grid>
+            <Grid item>누적</Grid>
+          </Grid>
+        </Typography>
 
+        {/* 스톱워치 디스플레이 시간 및 상태 표시 */}
         <div>
           <Typography variant="srOnly" component="h4">
             {displayedHeading}
           </Typography>
 
           <div>
-            <Typography>{displayedLabel}</Typography>
-            <TimeDisplay
-              hours={displayedTime.hours}
-              minutes={displayedTime.minutes}
-              seconds={displayedTime.seconds}
-            />
+            <Typography
+              align="center"
+              component="div"
+              className={classes.displayedLabel}
+            >
+              {displayedLabel}
+            </Typography>
+            <Typography
+              align="center"
+              component="div"
+              className={classes.displayedTime}
+            >
+              <TimeDisplay
+                hours={displayedTime.hours}
+                minutes={displayedTime.minutes}
+                seconds={displayedTime.seconds}
+              />
+            </Typography>
           </div>
         </div>
 
-        <div>
+        {/* 스톱워치 디스플레이 버튼 */}
+        <div className={classes.textCenter}>
           {/* 타이머가 한 번이라도 측정되었거나 기록이 저장되었으면 리셋 버튼을 표시 */}
           {(isStarted || localStorageKeyRef.current) && (
-            <button
-              type="button"
+            <Button
+              className={classes.buttonGap}
+              size="large"
+              variant="contained"
+              color="secondary"
               onClick={() => {
                 localStorageKeyRef.current = '';
                 setTotalStudyTime({ hours: 0, minutes: 0, seconds: 0 });
@@ -351,12 +417,15 @@ export default function (props: any) {
               }}
             >
               리셋
-            </button>
+            </Button>
           )}
 
           {isResumed ? (
-            <button
-              type="button"
+            <Button
+              className={classes.buttonGap}
+              size="large"
+              variant="contained"
+              color="primary"
               onClick={() => {
                 setIsResumed(false);
                 setRecord({
@@ -365,11 +434,14 @@ export default function (props: any) {
                 });
               }}
             >
-              쉬기
-            </button>
+              휴식
+            </Button>
           ) : (
-            <button
-              type="button"
+            <Button
+              className={classes.buttonGap}
+              size="large"
+              variant="contained"
+              color="primary"
               onClick={() => {
                 setIsStarted(true);
                 setIsResumed(true);
@@ -380,18 +452,24 @@ export default function (props: any) {
                 });
               }}
             >
-              공부하기
-            </button>
+              공부
+            </Button>
           )}
         </div>
-      </section>
+      </Grid>
 
-      <section>
-        <h3>공부기록</h3>
-        <div>
+      {/* 공부기록 섹션 */}
+      <Grid item component="section" xs={12}>
+        <Typography variant="srOnly" component="h3">
+          공부기록
+        </Typography>
+        <div className={classes.textRight}>
           {/* 저장하기 버튼은 저장하기 modal을 여는 역할을 함 */}
           {/* 실제로 저장하는 것이 아님 */}
-          <button
+          <Button
+            size="large"
+            variant="contained"
+            color="primary"
             onClick={() => {
               // 한 번이라도 스톱워치가 공부시간을 측정하지 않은 경우
               if (record.periodRecords.length === 0 && !isStarted) {
@@ -417,78 +495,91 @@ export default function (props: any) {
                 setIsStarted(false);
                 setIsResumed(false);
               }
-              setIsModalOpened(true);
+              setOpenSaveDialog(true);
             }}
           >
-            저장하기
-          </button>
+            저장
+          </Button>
         </div>
 
-        <StudyRecordTable record={record} />
-      </section>
+        <article>
+          <StudyRecordTable record={record} />
+        </article>
+      </Grid>
 
-      <Modal isOpened={isModalOpened}>
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            let key: string;
-            if (localStorageKeyRef.current === '') {
-              // 만약 스톱워치 사용중 저장한 적이 없으면
-              // 로컬 스토리지에 저장된 아이템의 개수에 1을 더해서 키값으로 설정
-              key = `${localStorage.length + 1}. ${record.heading}`;
-              localStorage.setItem(
-                key,
-                JSON.stringify({ ...record, localKey: localStorage.length + 1 })
-              );
-              localStorageKeyRef.current = key;
-            } else {
-              // 스톱워치 사용중 저장한 적이 있으면
-              // 로컬스토리지에 저장된 아이템 개수를 기준으로 키값 설정
-              // 왜냐하면 현재 존재하는 마지막 아이템을 지운 후
-              // 다시 새 아이템을 로컬 스토리지에 저장할 것이므로
-              key = `${localStorage.length}. ${record.heading}`;
-              localStorage.removeItem(localStorageKeyRef.current);
-              localStorage.setItem(
-                key,
-                JSON.stringify({ ...record, localKey: localStorage.length })
-              );
-              localStorageKeyRef.current = key;
-            }
+      <Dialog
+        open={openSaveDialog}
+        onClose={() => {
+          setOpenSaveDialog(false);
+        }}
+        aria-labelledby="form-dialog-title"
+      >
+        <DialogTitle disableTypography id="form-dialog-title">
+          <Typography variant="h6" component="h3">
+            공부기록 저장
+          </Typography>
+        </DialogTitle>
+        <DialogContent>
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              let key: string;
+              if (localStorageKeyRef.current === '') {
+                // 만약 스톱워치 사용중 저장한 적이 없으면
+                // 로컬 스토리지에 저장된 아이템의 개수에 1을 더해서 키값으로 설정
+                key = `${localStorage.length + 1}. ${record.heading}`;
+                localStorage.setItem(
+                  key,
+                  JSON.stringify({
+                    ...record,
+                    localKey: localStorage.length + 1,
+                  })
+                );
+                localStorageKeyRef.current = key;
+              } else {
+                // 스톱워치 사용중 저장한 적이 있으면
+                // 로컬스토리지에 저장된 아이템 개수를 기준으로 키값 설정
+                // 왜냐하면 현재 존재하는 마지막 아이템을 지운 후
+                // 다시 새 아이템을 로컬 스토리지에 저장할 것이므로
+                key = `${localStorage.length}. ${record.heading}`;
+                localStorage.removeItem(localStorageKeyRef.current);
+                localStorage.setItem(
+                  key,
+                  JSON.stringify({ ...record, localKey: localStorage.length })
+                );
+                localStorageKeyRef.current = key;
+              }
 
-            postStudyRecordsOfAllUsers(record);
+              postStudyRecordsOfAllUsers(record);
 
-            setIsModalOpened(false);
-            setRecord({ type: 'heading', heading: '' });
-          }}
-        >
-          <h3>공부기록 저장</h3>
-
-          <div>
-            <label htmlFor="heading">제목</label>
-            <input
+              setOpenSaveDialog(false);
+              setRecord({ type: 'heading', heading: '' });
+            }}
+          >
+            <TextField
+              autoFocus
+              id="saveRecordHeading"
+              label="제목"
               type="text"
-              id="heading"
-              value={record.heading}
               onChange={(e) =>
                 setRecord({ type: 'heading', heading: e.target.value })
               }
             />
-          </div>
 
-          <div>
-            <button type="submit">저장</button>
-            <button
-              type="button"
-              onClick={() => {
-                setRecord({ type: 'heading', heading: '' });
-                setIsModalOpened(false);
-              }}
-            >
-              취소
-            </button>
-          </div>
-        </form>
-      </Modal>
-    </div>
+            <DialogActions>
+              <Button type="submit">취소</Button>
+              <Button
+                onClick={() => {
+                  setRecord({ type: 'heading', heading: '' });
+                  setOpenSaveDialog(false);
+                }}
+              >
+                저장
+              </Button>
+            </DialogActions>
+          </form>
+        </DialogContent>
+      </Dialog>
+    </Grid>
   );
 }
