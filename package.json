@@ -1,6 +1,6 @@
 {
   "name": "study-stopwatch-app",
-  "version": "0.36.0",
+  "version": "0.36.1",
   "private": true,
   "dependencies": {
     "@material-ui/core": "^4.11.0",
