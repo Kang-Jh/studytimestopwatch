@@ -341,7 +341,13 @@ export default function (props: any) {
       </Typography>
 
       {/* 스톱워치 디스플레이 아티클 */}
-      <Grid item component="article" xs={12} className={classes.timeDisplay}>
+      <Grid
+        item
+        component="article"
+        xs={12}
+        md={7}
+        className={classes.timeDisplay}
+      >
         <Typography variant="srOnly" component="h3">
           스톱워치 디스플레이
         </Typography>
@@ -459,7 +465,7 @@ export default function (props: any) {
       </Grid>
 
       {/* 공부기록 섹션 */}
-      <Grid item component="section" xs={12}>
+      <Grid item component="section" xs={12} md={7}>
         <Typography variant="srOnly" component="h3">
           공부기록
         </Typography>
@@ -565,15 +571,15 @@ export default function (props: any) {
             />
 
             <DialogActions>
-              <Button type="submit">취소</Button>
               <Button
                 onClick={() => {
                   setRecord({ type: 'heading', heading: '' });
                   setOpenSaveDialog(false);
                 }}
               >
-                저장
+                취소
               </Button>
+              <Button type="submit">저장</Button>
             </DialogActions>
           </form>
         </DialogContent>
