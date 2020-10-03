@@ -492,8 +492,6 @@ export default function (props: any) {
                   type: 'restTime',
                   totalRestTime,
                 });
-                setIsStarted(false);
-                setIsResumed(false);
               }
               setOpenSaveDialog(true);
             }}
