@@ -4,8 +4,19 @@ import StudyRecordTable from '../components/StudyRecordTable';
 import { useParams } from 'react-router-dom';
 import { StudyRecord } from '../@types/studyRecord';
 import { getDateAsKorean } from '../utils/time';
+import { Typography, makeStyles } from '@material-ui/core';
+
+const useStyles = makeStyles((theme) => ({
+  heading: {
+    marginBottom: theme.spacing(5),
+  },
+  date: {
+    marginBottom: theme.spacing(3),
+  },
+}));
 
 export default function (props: any) {
+  const classes = useStyles();
   const { id }: { id: string } = useParams();
   const [record, setRecord] = useState<StudyRecord | null>(null);
 
@@ -26,10 +37,25 @@ export default function (props: any) {
 
   return (
     <div>
-      <span>{getDateAsKorean(record.date)}</span>
+      <Typography
+        variant="h4"
+        component="h2"
+        align="center"
+        className={classes.heading}
+      >
+        {record.heading}
+      </Typography>
+
+      <Typography
+        variant="body1"
+        component="p"
+        align="right"
+        className={classes.date}
+      >
+        {getDateAsKorean(record.date)}
+      </Typography>
 
       <Statistic
-        heading="통계"
         totalPeriod={record.periodRecords.length}
         totalStudyTime={record.totalStudyTime}
         totalRestTime={record.totalRestTime}
