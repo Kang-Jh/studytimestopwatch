@@ -11,7 +11,7 @@ function getDisplayTime(number: number): string {
 
 export default function ({ hours, minutes, seconds }: Time) {
   return (
-    <span className="inline-block">
+    <span>
       {getDisplayTime(hours)}:{getDisplayTime(minutes)}:
       {getDisplayTime(seconds)}
     </span>
