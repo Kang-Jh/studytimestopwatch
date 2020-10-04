@@ -5,6 +5,7 @@ import {
   convertSecondsToTime,
   convertTimeToSeconds,
 } from '../utils/time';
+import { Typography, Grid, makeStyles } from '@material-ui/core';
 
 interface StatisticProps {
   heading?: string;
@@ -13,12 +14,19 @@ interface StatisticProps {
   totalRestTime: Time;
 }
 
+const useStyles = makeStyles((theme) => ({
+  heading: {
+    marginBottom: theme.spacing(4),
+  },
+}));
+
 export default function ({
-  heading = '통계',
+  heading,
   totalPeriod,
   totalStudyTime,
   totalRestTime,
 }: StatisticProps) {
+  const classes = useStyles();
   let initialAverageTime: Time = { hours: 0, minutes: 0, seconds: 0 };
   let averageStudyTime: Time;
   let averageRestTime: Time;
@@ -41,33 +49,64 @@ export default function ({
   }
 
   return (
-    <article>
-      <h2>{heading}</h2>
+    <Grid container component="article" justify="center" spacing={2}>
+      {heading ? (
+        <Grid item xs={12} className={classes.heading}>
+          <Typography variant="h5" component="h2" align="center">
+            {heading}
+          </Typography>
+        </Grid>
+      ) : null}
 
-      <article>
-        <span>총 교시 </span>
-        <span>{totalPeriod}</span>
-      </article>
+      <Grid item xs={12}>
+        <Typography variant="body1" component="div" align="center">
+          총 교시
+        </Typography>
 
-      <article>
-        <span>총 공부시간 </span>
-        <span>{convertTimeAsKorean(totalStudyTime)}</span>
-      </article>
+        <Typography variant="body1" component="div" align="center">
+          {totalPeriod}교시
+        </Typography>
+      </Grid>
 
-      <article>
-        <span>총 휴식시간 </span>
-        <span>{convertTimeAsKorean(totalRestTime)}</span>
-      </article>
+      <Grid item xs={12} md={6}>
+        <Typography variant="body1" component="div" align="center">
+          총 공부시간
+        </Typography>
 
-      <article>
-        <span>교시당 공부시간 </span>
-        <span>{convertTimeAsKorean(averageStudyTime)}</span>
-      </article>
+        <Typography variant="body1" component="div" align="center">
+          {convertTimeAsKorean(totalStudyTime)}
+        </Typography>
+      </Grid>
 
-      <article>
-        <span>교시당 휴식시간 </span>
-        <span>{convertTimeAsKorean(averageRestTime)}</span>
-      </article>
-    </article>
+      <Grid item xs={12} md={6}>
+        <Typography variant="body1" component="div" align="center">
+          총 휴식시간
+        </Typography>
+
+        <Typography variant="body1" component="div" align="center">
+          {convertTimeAsKorean(totalRestTime)}
+        </Typography>
+      </Grid>
+
+      <Grid item xs={12} md={6}>
+        <Typography variant="body1" component="div" align="center">
+          교시당 공부시간
+        </Typography>
+
+        <Typography variant="body1" component="div" align="center">
+          {convertTimeAsKorean(averageStudyTime)}
+        </Typography>
+      </Grid>
+
+      <Grid item xs={12} md={6}>
+        <Typography variant="body1" component="div" align="center">
+          교시당 휴식시간
+        </Typography>
+
+        <Typography variant="body1" component="div" align="center">
+          {convertTimeAsKorean(averageRestTime)}
+        </Typography>
+      </Grid>
+    </Grid>
   );
 }
