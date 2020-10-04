@@ -104,7 +104,7 @@ export default function (props: any) {
 
       <Grid item xs={12} md={7}>
         <Statistic
-          heading="전체 통계"
+          heading="내 통계"
           totalPeriod={totalPeriod}
           totalStudyTime={totalStudyTime}
           totalRestTime={totalRestTime}
