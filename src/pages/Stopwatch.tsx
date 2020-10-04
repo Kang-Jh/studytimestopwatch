@@ -506,9 +506,7 @@ export default function (props: any) {
           </Button>
         </div>
 
-        <article>
-          <StudyRecordTable record={record} />
-        </article>
+        <StudyRecordTable record={record} />
       </Grid>
 
       <Dialog

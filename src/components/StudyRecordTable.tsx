@@ -4,10 +4,10 @@ import { StudyRecord } from '../@types/studyRecord';
 
 export default function ({ record }: { record: StudyRecord }) {
   return (
-    <div>
-      <table className="StudyRecordTable-table">
-        <caption className="srOnly">교시당 공부시간 및 휴식시간</caption>
-        <thead className="srOnly">
+    <article>
+      <table>
+        <caption>교시당 공부시간 및 휴식시간</caption>
+        <thead>
           <tr>
             <th scope="col">교시</th>
             <th scope="col">공부시간</th>
@@ -52,6 +52,6 @@ export default function ({ record }: { record: StudyRecord }) {
           )}
         </tbody>
       </table>
-    </div>
+    </article>
   );
 }

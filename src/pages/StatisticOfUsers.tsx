@@ -34,7 +34,7 @@ export default function () {
   }, []);
 
   return (
-    <div className="StatsticOfUsers">
+    <div>
       <Statistic
         heading="전체유저 통계"
         totalPeriod={totalPeriod}
