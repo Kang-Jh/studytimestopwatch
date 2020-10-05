@@ -235,7 +235,6 @@ export default function (props: any) {
     }
   }, [isStarted, isResumed]);
 
-  // FIXME 현재공부시간과 총공부시간 동기화
   // useEffect 사용시 일시정지, 시작버튼을 빠르게 연속클릭할 시
   // 정지되어야 할 상황에서도 타이머가 계속 실행됨
   // 공부시간을 측정하기 위한 이펙트
@@ -245,7 +244,10 @@ export default function (props: any) {
       let rAF: number;
 
       // 실행시간은 버튼이 클릭된 시간에서 마운트된 시간과 휴식 시간을 뺀 것
-      let totalRunningTime: number;
+      // 초기값을 0으로 설정해주는 것은 공부와 휴식 버튼이 빠른 속도로 계속 클릭될 경우
+      // 화면에 시간이 페인팅 되기 전에 이펙트가 클린업 되므로
+      // timeRef들이 undefined로 바뀜
+      let totalRunningTime: number = 0;
 
       const buttonClickedTime = getNow();
       const prevTotalRunningTime = totalRunningTimeRef.current;
@@ -288,7 +290,6 @@ export default function (props: any) {
     }
   }, [isStarted, isResumed]);
 
-  // FIXME 현재휴식시간과 총휴식시간 동기화
   // 휴식시간을 측정하기 위한 이펙트
   // 공부시간을 측정하는 이펙트와 로직은 동일
   useLayoutEffect(() => {
@@ -296,7 +297,7 @@ export default function (props: any) {
     if (isStarted && !isResumed) {
       let rAF: number;
 
-      let totalRestTime: number;
+      let totalRestTime: number = 0;
 
       const buttonClickedTime: number = getNow();
       const prevTotalRestTime = totalRestTimeRef.current;
