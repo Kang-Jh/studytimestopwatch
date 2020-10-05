@@ -244,10 +244,11 @@ export default function (props: any) {
       let rAF: number;
 
       // 실행시간은 버튼이 클릭된 시간에서 마운트된 시간과 휴식 시간을 뺀 것
-      // 초기값을 0으로 설정해주는 것은 공부와 휴식 버튼이 빠른 속도로 계속 클릭될 경우
+      // 초기값을 totalRunningTime으로 설정해주는 것은 공부와 휴식 버튼이 빠른 속도로 계속 클릭될 경우
       // 화면에 시간이 페인팅 되기 전에 이펙트가 클린업 되므로
       // timeRef들이 undefined로 바뀜
-      let totalRunningTime: number = 0;
+      // 0을 초기값으로 할 경우 totalTime 자체가 초기화 될 수 있음
+      let totalRunningTime: number = totalRunningTimeRef.current;
 
       const buttonClickedTime = getNow();
       const prevTotalRunningTime = totalRunningTimeRef.current;
@@ -297,7 +298,7 @@ export default function (props: any) {
     if (isStarted && !isResumed) {
       let rAF: number;
 
-      let totalRestTime: number = 0;
+      let totalRestTime: number = totalRestTimeRef.current;
 
       const buttonClickedTime: number = getNow();
       const prevTotalRestTime = totalRestTimeRef.current;
