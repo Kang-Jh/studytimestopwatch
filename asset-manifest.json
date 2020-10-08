@@ -1,19 +1,19 @@
 {
   "files": {
-    "main.js": "/studytimestopwatch/static/js/main.80208ea2.chunk.js",
-    "main.js.map": "/studytimestopwatch/static/js/main.80208ea2.chunk.js.map",
+    "main.js": "/studytimestopwatch/static/js/main.86bb4ae8.chunk.js",
+    "main.js.map": "/studytimestopwatch/static/js/main.86bb4ae8.chunk.js.map",
     "runtime-main.js": "/studytimestopwatch/static/js/runtime-main.ed51f635.js",
     "runtime-main.js.map": "/studytimestopwatch/static/js/runtime-main.ed51f635.js.map",
     "static/js/2.cf9f026a.chunk.js": "/studytimestopwatch/static/js/2.cf9f026a.chunk.js",
     "static/js/2.cf9f026a.chunk.js.map": "/studytimestopwatch/static/js/2.cf9f026a.chunk.js.map",
     "index.html": "/studytimestopwatch/index.html",
-    "precache-manifest.d0d6b7518a679229dbb3876148bd9c69.js": "/studytimestopwatch/precache-manifest.d0d6b7518a679229dbb3876148bd9c69.js",
+    "precache-manifest.0c85a6045e91fe21ee4b8926cccc88a2.js": "/studytimestopwatch/precache-manifest.0c85a6045e91fe21ee4b8926cccc88a2.js",
     "service-worker.js": "/studytimestopwatch/service-worker.js",
     "static/js/2.cf9f026a.chunk.js.LICENSE.txt": "/studytimestopwatch/static/js/2.cf9f026a.chunk.js.LICENSE.txt"
   },
   "entrypoints": [
     "static/js/runtime-main.ed51f635.js",
     "static/js/2.cf9f026a.chunk.js",
-    "static/js/main.80208ea2.chunk.js"
+    "static/js/main.86bb4ae8.chunk.js"
   ]
 }

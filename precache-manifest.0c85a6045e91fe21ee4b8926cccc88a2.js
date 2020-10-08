@@ -1,6 +1,6 @@
 self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
-    "revision": "7363edc5147821c4b9aae5ed25464fd4",
+    "revision": "5f6ed6c34c38576ffbb06bb9993ace1c",
     "url": "/studytimestopwatch/index.html"
   },
   {
@@ -12,8 +12,8 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/studytimestopwatch/static/js/2.cf9f026a.chunk.js.LICENSE.txt"
   },
   {
-    "revision": "01a6f70d0f03afbe3aee",
-    "url": "/studytimestopwatch/static/js/main.80208ea2.chunk.js"
+    "revision": "8ce8c60fb5341eaab2c4",
+    "url": "/studytimestopwatch/static/js/main.86bb4ae8.chunk.js"
   },
   {
     "revision": "418aa1cf2f944b02a84b",
