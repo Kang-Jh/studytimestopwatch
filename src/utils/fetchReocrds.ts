@@ -4,7 +4,7 @@ import { Time } from '../@types/time';
 export async function postStudyRecordsOfAllUsers(record: StudyRecord) {
   try {
     const response = await fetch(
-      'http://localhost:4000/api/studyRecordsOfAllUsers',
+      'https://api.studytimestopwatch.com/studyRecordsOfAllUsers',
       {
         method: 'POST',
         headers: {
@@ -28,7 +28,7 @@ export async function getStatisticOfAllUsers(
   totalRestTime: Time;
 }> {
   const response = await fetch(
-    'http://localhost:4000/api/statisticOfAllUsers',
+    'https://api.studytimestopwatch.com/statisticOfAllUsers',
 
     {
       signal,
