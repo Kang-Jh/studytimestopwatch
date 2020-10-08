@@ -14,7 +14,7 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-sw.js");
 
 importScripts(
-  "/studytime-stopwatch-app/precache-manifest.a2a0129904027d8981aedbd0063d5be2.js"
+  "/studytime-stopwatch-app/precache-manifest.74777bdb8671d590e30c6207c95148b0.js"
 );
 
 self.addEventListener('message', (event) => {

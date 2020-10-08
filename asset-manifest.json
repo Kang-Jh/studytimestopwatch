@@ -1,19 +1,19 @@
 {
   "files": {
-    "main.js": "/studytime-stopwatch-app/static/js/main.a855fff6.chunk.js",
-    "main.js.map": "/studytime-stopwatch-app/static/js/main.a855fff6.chunk.js.map",
+    "main.js": "/studytime-stopwatch-app/static/js/main.2dccd3b6.chunk.js",
+    "main.js.map": "/studytime-stopwatch-app/static/js/main.2dccd3b6.chunk.js.map",
     "runtime-main.js": "/studytime-stopwatch-app/static/js/runtime-main.2e0d8883.js",
     "runtime-main.js.map": "/studytime-stopwatch-app/static/js/runtime-main.2e0d8883.js.map",
     "static/js/2.7b89482f.chunk.js": "/studytime-stopwatch-app/static/js/2.7b89482f.chunk.js",
     "static/js/2.7b89482f.chunk.js.map": "/studytime-stopwatch-app/static/js/2.7b89482f.chunk.js.map",
     "index.html": "/studytime-stopwatch-app/index.html",
-    "precache-manifest.a2a0129904027d8981aedbd0063d5be2.js": "/studytime-stopwatch-app/precache-manifest.a2a0129904027d8981aedbd0063d5be2.js",
+    "precache-manifest.74777bdb8671d590e30c6207c95148b0.js": "/studytime-stopwatch-app/precache-manifest.74777bdb8671d590e30c6207c95148b0.js",
     "service-worker.js": "/studytime-stopwatch-app/service-worker.js",
     "static/js/2.7b89482f.chunk.js.LICENSE.txt": "/studytime-stopwatch-app/static/js/2.7b89482f.chunk.js.LICENSE.txt"
   },
   "entrypoints": [
     "static/js/runtime-main.2e0d8883.js",
     "static/js/2.7b89482f.chunk.js",
-    "static/js/main.a855fff6.chunk.js"
+    "static/js/main.2dccd3b6.chunk.js"
   ]
 }
