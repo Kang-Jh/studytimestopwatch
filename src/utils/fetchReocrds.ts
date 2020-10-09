@@ -7,6 +7,7 @@ export async function postStudyRecordsOfAllUsers(record: StudyRecord) {
       'https://api.studytimestopwatch.com/studyRecordsOfAllUsers',
       {
         method: 'POST',
+        mode: 'cors',
         headers: {
           'Content-Type': 'application/json',
         },
@@ -29,9 +30,9 @@ export async function getStatisticOfAllUsers(
 }> {
   const response = await fetch(
     'https://api.studytimestopwatch.com/statisticOfAllUsers',
-
     {
       signal,
+      mode: 'cors',
       headers: {
         Accept: 'application/json',
       },
