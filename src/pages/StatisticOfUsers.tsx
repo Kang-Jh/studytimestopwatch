@@ -2,7 +2,13 @@ import React, { useEffect } from 'react';
 import Statistic from '../components/Statistic';
 import { getStatisticOfAllUsers } from '../utils/fetchReocrds';
 import { Time } from '../@types/time';
-import { Typography } from '@material-ui/core';
+import { Typography, makeStyles } from '@material-ui/core';
+
+const useStyles = makeStyles((theme) => ({
+  info: {
+    marginBottom: theme.spacing(5),
+  },
+}));
 
 export default function ({
   statisticFetched,
@@ -23,6 +29,7 @@ export default function ({
   setTotalStudyTime: React.Dispatch<React.SetStateAction<Time>>;
   setTotalRestTime: React.Dispatch<React.SetStateAction<Time>>;
 }) {
+  const classes = useStyles();
   useEffect(() => {
     if (statisticFetched) {
       return;
@@ -53,9 +60,15 @@ export default function ({
 
   return (
     <div>
-      <Typography component="p" variant="body1">
+      <Typography
+        component="p"
+        variant="body1"
+        align="center"
+        className={classes.info}
+      >
         전체유저 통계는 실시간 업데이트 되지 않고 일 단위로 업데이트 됩니다
       </Typography>
+
       <Statistic
         heading="전체유저 통계"
         totalPeriod={totalPeriod}
