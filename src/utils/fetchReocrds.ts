@@ -3,19 +3,16 @@ import { Time } from '../@types/time';
 
 export async function postStudyRecordsOfAllUsers(record: StudyRecord) {
   try {
-    const response = await fetch(
-      'https://api.studytimestopwatch.com/studyRecordsOfAllUsers',
-      {
-        method: 'POST',
-        mode: 'cors',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(record),
-      }
-    );
-    const json = await response.json();
-    return json;
+    await fetch('https://api.studytimestopwatch.com/studyRecordsOfAllUsers', {
+      method: 'POST',
+      mode: 'cors',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(record),
+    });
+
+    return;
   } catch (e) {
     console.error(e);
   }
@@ -38,12 +35,24 @@ export async function getStatisticOfAllUsers(
       },
     }
   );
-  const json = await response.json();
-  const { totalPeriod, totalStudyTime, totalRestTime } = json;
 
-  return {
-    totalPeriod,
-    totalStudyTime,
-    totalRestTime,
-  };
+  if (response.ok) {
+    const json = await response.json();
+    const {
+      totalPeriod,
+      totalRestTime,
+      totalStudyTime,
+    }: {
+      totalPeriod: number;
+      totalRestTime: Time;
+      totalStudyTime: Time;
+    } = json;
+    return { totalPeriod, totalRestTime, totalStudyTime };
+  } else {
+    return {
+      totalPeriod: 0,
+      totalRestTime: { hours: 0, minutes: 0, seconds: 0 },
+      totalStudyTime: { hours: 0, minutes: 0, seconds: 0 },
+    };
+  }
 }
