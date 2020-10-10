@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Route, Switch } from 'react-router-dom';
 import { Header } from './components/HeaderAndNav';
 import Stopwatch from './pages/Stopwatch';
@@ -6,6 +6,7 @@ import MyRecords from './pages/MyRecords';
 import DetailRecord from './pages/DetailRecord';
 import StatisticOfUsers from './pages/StatisticOfUsers';
 import { CssBaseline, Container, makeStyles, Toolbar } from '@material-ui/core';
+import { Time } from './@types/time';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -29,6 +30,18 @@ const useStyles = makeStyles((theme) => ({
 
 function App() {
   const classes = useStyles();
+  const [fetchStatistic, setFetchStatistic] = useState(false);
+  const [totalPeriod, setTotalPeriod] = useState(0);
+  const [totalStudyTime, setTotalStudyTime] = useState<Time>({
+    hours: 0,
+    minutes: 0,
+    seconds: 0,
+  });
+  const [totalRestTime, setTotalRestTime] = useState<Time>({
+    hours: 0,
+    minutes: 0,
+    seconds: 0,
+  });
 
   return (
     <div className="App" aria-live="assertive">
@@ -49,7 +62,16 @@ function App() {
               </Route>
 
               <Route exact path="/statisticOfUsers">
-                <StatisticOfUsers />
+                <StatisticOfUsers
+                  statisticFetched={fetchStatistic}
+                  totalPeriod={totalPeriod}
+                  totalStudyTime={totalStudyTime}
+                  totalRestTime={totalRestTime}
+                  setStatisticFetched={setFetchStatistic}
+                  setTotalPeriod={setTotalPeriod}
+                  setTotalStudyTime={setTotalStudyTime}
+                  setTotalRestTime={setTotalRestTime}
+                />
               </Route>
 
               <Route path="/">
