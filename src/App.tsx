@@ -80,7 +80,7 @@ function App() {
             </Switch>
           </Container>
 
-          <footer className={classes.footer}>test</footer>
+          <footer className={classes.footer}></footer>
         </div>
       </div>
     </div>
