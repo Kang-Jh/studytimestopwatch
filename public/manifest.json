@@ -1,6 +1,6 @@
 {
-  "short_name": "Study-time Stopwatch",
-  "name": "Study-time Stopwatch Application",
+  "short_name": "공부용 스톱워치",
+  "name": "공부용 스톱워치 애플리케이션",
   "icons": [
     {
       "src": "favicon.ico",
