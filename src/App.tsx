@@ -1,11 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Route, Switch } from 'react-router-dom';
 import { Header } from './components/HeaderAndNav';
 import Stopwatch from './pages/Stopwatch';
 import MyRecords from './pages/MyRecords';
 import DetailRecord from './pages/DetailRecord';
 import StatisticOfUsers from './pages/StatisticOfUsers';
-import { CssBaseline, Container, makeStyles, Toolbar } from '@material-ui/core';
+import {
+  CssBaseline,
+  Container,
+  makeStyles,
+  Toolbar,
+  Snackbar,
+} from '@material-ui/core';
+import { Alert } from '@material-ui/lab';
 import { Time } from './@types/time';
 
 const useStyles = makeStyles((theme) => ({
@@ -42,6 +49,20 @@ function App() {
     minutes: 0,
     seconds: 0,
   });
+  const [openServiceWorkerSnackbar, setOpenServiceWorkerSnackbar] = useState(
+    false
+  );
+  const [openOfflineModeSnackbar, setOpenOfflineModeSnackbar] = useState(false);
+
+  useEffect(() => {
+    if ('serviceWorker' in navigator) {
+      if (navigator.serviceWorker.controller && !navigator.onLine) {
+        setOpenOfflineModeSnackbar(true);
+      } else if (navigator.serviceWorker.controller && navigator.onLine) {
+        setOpenServiceWorkerSnackbar(true);
+      }
+    }
+  }, []);
 
   return (
     <div className="App" aria-live="assertive">
@@ -83,6 +104,50 @@ function App() {
           <footer className={classes.footer}></footer>
         </div>
       </div>
+
+      <Snackbar
+        open={openServiceWorkerSnackbar}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+        autoHideDuration={3000}
+        onClose={(event, reason) => {
+          if (reason === 'clickaway') {
+            return;
+          }
+
+          setOpenServiceWorkerSnackbar(false);
+        }}
+      >
+        <Alert
+          severity="success"
+          onClose={() => {
+            setOpenServiceWorkerSnackbar(false);
+          }}
+        >
+          오프라인 모드에서 실행가능합니다
+        </Alert>
+      </Snackbar>
+
+      <Snackbar
+        open={openOfflineModeSnackbar}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+        autoHideDuration={3000}
+        onClose={(event, reason) => {
+          if (reason === 'clickaway') {
+            return;
+          }
+
+          setOpenOfflineModeSnackbar(false);
+        }}
+      >
+        <Alert
+          severity="info"
+          onClose={() => {
+            setOpenOfflineModeSnackbar(false);
+          }}
+        >
+          오프라인 모드에서 실행중입니다
+        </Alert>
+      </Snackbar>
     </div>
   );
 }
