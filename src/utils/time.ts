@@ -1,11 +1,7 @@
 import { Time, TimeObject } from '../@types/time';
 
-export const isPerformanceExist: boolean =
-  typeof performance === 'object' ? true : false;
-// performance가 존재하지 않으면 Date로 대체
-export const timeObject: TimeObject = isPerformanceExist ? performance : Date;
 // getNow 함수를 이용하는 이유는 performance.now()를 사용할 수 없을 경우 Date.now()를 사용하기 위함
-export const getNow = (): number => timeObject.now();
+export const getNow = (timeObject: TimeObject): number => timeObject.now();
 export const convertMiliSecondsToSeconds = (miliseconds: number): number =>
   Math.floor(miliseconds / 1000);
 
