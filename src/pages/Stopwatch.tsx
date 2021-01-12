@@ -56,9 +56,7 @@ export default function (props: any) {
     currentStudyTime,
     currentRestTime,
     reset,
-  } = useStopwatch({
-    timeObject: typeof performance === 'object' ? performance : Date,
-  });
+  } = useStopwatch();
 
   const [record, setRecord] = useStudyRecord();
 

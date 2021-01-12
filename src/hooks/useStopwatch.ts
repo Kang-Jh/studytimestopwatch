@@ -7,11 +7,9 @@ import {
   convertMiliSecondsToSeconds,
 } from '../utils/time';
 
-export default function useStopwatch({
-  timeObject,
-}: {
-  timeObject: TimeObject;
-}): {
+const timeObject: TimeObject =
+  typeof performance === 'object' ? performance : Date;
+export default function useStopwatch(): {
   totalStudyTime: Time;
   totalRestTime: Time;
   isStarted: boolean;
@@ -122,7 +120,7 @@ export default function useStopwatch({
         cancelAnimationFrame(rAF);
       };
     }
-  }, [isStarted, isResumed, timeObject]);
+  }, [isStarted, isResumed]);
 
   // 휴식시간을 측정하기 위한 이펙트
   // 공부시간을 측정하는 이펙트와 로직은 동일
@@ -167,7 +165,7 @@ export default function useStopwatch({
         cancelAnimationFrame(rAF);
       };
     }
-  }, [isStarted, isResumed, timeObject]);
+  }, [isStarted, isResumed]);
 
   return {
     totalStudyTime,
