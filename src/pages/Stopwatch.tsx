@@ -15,6 +15,9 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
+  FormGroup,
+  FormControlLabel,
+  Checkbox,
 } from '@material-ui/core';
 
 const useStyles = makeStyles((theme) => ({
@@ -62,6 +65,8 @@ export default function (props: any) {
 
   const [openSaveDialog, setOpenSaveDialog] = useState(false);
   const [showTotalTime, setShowTotalTime] = useState(false);
+
+  const [shouldSaveOnServer, setShouldSaveOnServer] = useState(false);
 
   const displayedStudyTimeHeading = !isStarted
     ? '스톱워치 초기상태 또는 정지상태'
@@ -300,27 +305,45 @@ export default function (props: any) {
                 );
                 localStorageKeyRef.current = key;
               }
+              if (shouldSaveOnServer) {
+                postStudyRecordsOfAllUsers(record);
+              }
 
-              postStudyRecordsOfAllUsers(record);
-
+              setShouldSaveOnServer(false);
               setOpenSaveDialog(false);
               setRecord({ type: 'heading', heading: '' });
             }}
           >
-            <TextField
-              autoFocus
-              id="saveRecordHeading"
-              label="제목"
-              type="text"
-              onChange={(e) =>
-                setRecord({ type: 'heading', heading: e.target.value })
-              }
-            />
+            <FormGroup>
+              <TextField
+                autoFocus
+                id="saveRecordHeading"
+                label="제목"
+                type="text"
+                onChange={(e) =>
+                  setRecord({ type: 'heading', heading: e.target.value })
+                }
+              />
+            </FormGroup>
+
+            <FormGroup>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={shouldSaveOnServer}
+                    onChange={(e) => setShouldSaveOnServer(e.target.checked)}
+                    color="primary"
+                  />
+                }
+                label="서버에 저장"
+              />
+            </FormGroup>
 
             <DialogActions>
               <Button
                 onClick={() => {
                   setRecord({ type: 'heading', heading: '' });
+                  setShouldSaveOnServer(false);
                   setOpenSaveDialog(false);
                 }}
               >
